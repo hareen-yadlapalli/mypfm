@@ -1,4 +1,4 @@
-// src/components/Header.js
+// src/components/Header/Header.jsx
 import React from 'react';
 
 const Header = () => {
@@ -10,7 +10,8 @@ const Header = () => {
 };
 
 const headerStyle = {
-  background: '#333',
+  height: '60px', // Adjust the height as needed
+  backgroundColor: '#333',
   color: '#fff',
   padding: '10px 20px',
   textAlign: 'center',

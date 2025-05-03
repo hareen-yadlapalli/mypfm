@@ -20,6 +20,8 @@ a {
   font-size: 18px;
 }
 
+/* Add this to your index.css or inside a <style> tag for hover effects */
 a:hover {
+  background-color: #f0f0f0;
   color: #007bff;
 }
