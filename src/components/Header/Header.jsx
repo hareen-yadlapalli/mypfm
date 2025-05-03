@@ -1,9 +1,19 @@
-import React from 'react'
+// src/components/Header.js
+import React from 'react';
 
-function Header() {
+const Header = () => {
   return (
-    <div>Header</div>
-  )
-}
+    <header style={headerStyle}>
+      <h1>My React App</h1>
+    </header>
+  );
+};
 
-export default Header
+const headerStyle = {
+  background: '#333',
+  color: '#fff',
+  padding: '10px 20px',
+  textAlign: 'center',
+};
+
+export default Header;
