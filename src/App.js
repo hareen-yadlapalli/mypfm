@@ -14,15 +14,12 @@ import BillsScreen from './screens/BillsScreen/BillsScreen';
 import CategoriesScreen from './screens/CategoriesScreen/CategoriesScreen';
 
 const App = () => {
-  const headerHeight = 60; // Set your header height (adjust accordingly)
-
   return (
     <Router>
       <div style={appStyle}>
         <Header />
-        <div style={{ ...mainContentStyle }}>
-          {/* Pass the header height to Sidebar */}
-          <Sidebar headerHeight={headerHeight} />
+        <div style={mainContentStyle}>
+          <Sidebar />
           <div style={contentStyle}>
             <Routes>
               <Route path="/" element={<HomeScreen />} />
@@ -34,7 +31,6 @@ const App = () => {
               <Route path="/purchaseditems" element={<PurchasedItemsScreen />} />
               <Route path="/bills" element={<BillsScreen />} />
               <Route path="/categories" element={<CategoriesScreen />} />
-
             </Routes>
           </div>
         </div>
@@ -52,7 +48,6 @@ const appStyle = {
 const mainContentStyle = {
   display: 'flex',
   flex: 1,
-  transition: 'margin-top 0.3s ease-in-out',
 };
 
 const contentStyle = {

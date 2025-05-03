@@ -2,9 +2,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Sidebar = ({ headerHeight }) => {
+const Sidebar = () => {
   return (
-    <div style={{ ...sidebarStyle}}>
+    <div style={sidebarStyle}>
       <div style={navItemStyle}>
         <Link to="/" style={linkStyle}>Home</Link>
       </div>
@@ -41,7 +41,7 @@ const sidebarStyle = {
   background: '#f4f4f4',
   position: 'fixed',
   left: '0',
-  height: 'calc(100vh - 60px)', // Adjust height dynamically based on the header height
+  height: 'calc(100vh - 60px)', // Sidebar takes full height minus the header height (hardcoded as 60px)
   borderTop: '2px solid #ccc', // Full-width border at the top
   borderBottom: '2px solid #ccc', // Full-width border at the bottom
   display: 'flex',
