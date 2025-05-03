@@ -20,7 +20,7 @@ const App = () => {
     <Router>
       <div style={appStyle}>
         <Header />
-        <div style={{ ...mainContentStyle, marginTop: `${headerHeight}px` }}>
+        <div style={{ ...mainContentStyle }}>
           {/* Pass the header height to Sidebar */}
           <Sidebar headerHeight={headerHeight} />
           <div style={contentStyle}>

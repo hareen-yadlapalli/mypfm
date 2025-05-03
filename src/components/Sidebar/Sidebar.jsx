@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Sidebar = ({ headerHeight }) => {
   return (
-    <div style={{ ...sidebarStyle, top: `${headerHeight}px` }}>
+    <div style={{ ...sidebarStyle}}>
       <div style={navItemStyle}>
         <Link to="/" style={linkStyle}>Home</Link>
       </div>
