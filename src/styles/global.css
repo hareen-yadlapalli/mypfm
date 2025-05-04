@@ -84,6 +84,14 @@
     background: var(--bg-color);
   }
   
+  /* BUTTON ROW CONTAINER */
+  .button-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
   /* GENERIC BUTTONS */
   .button,
   button {
@@ -115,7 +123,6 @@
     border: 1px solid #ccd0d5;
     border-radius: 4px;
     font-size: 14px;
-    margin-right: 16px;
     width: 240px;
   }
   
@@ -224,8 +231,7 @@
     box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 16px;
   }
-  
-  /* Inputs & selects fill columns */
+  /* Fill selects & inputs */
   .advanced-search select,
   .advanced-search input {
     width: 100%;
@@ -234,21 +240,18 @@
     border-radius: 4px;
     font-size: 14px;
   }
-  
-  /* Action-cell containing remove and, on last row, add */
+  /* Action-cell containing remove and add */
   .action-cell {
     display: flex;
     gap: 4px;
     justify-content: flex-end;
     align-items: center;
   }
-  
   /* Compact small buttons */
   .advanced-search .small {
     padding: 4px 8px;
     font-size: 12px;
   }
-  
   /* Footer buttons placement */
   /* Search under Field (col 1) */
   .advanced-search > button.button-primary {
@@ -260,6 +263,8 @@
     grid-column: 2;
     justify-self: start;
   }
-  /* empty placeholders fill cols 3 & 4 */
-  .advanced-search > div { }
+  /* Placeholder cells fill cols 3 & 4 */
+  .advanced-search > div {
+    /* empty */
+  }
   
