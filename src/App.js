@@ -12,7 +12,9 @@ import PurchasesScreen from './screens/PurchasesScreen/PurchasesScreen';
 import PurchasedItemsScreen from './screens/PurchasedItemsScreen/PurchasedItemsScreen';
 import BillsScreen from './screens/BillsScreen/BillsScreen';
 import CategoriesScreen from './screens/CategoriesScreen/CategoriesScreen';
-import './styles/screens.css';  // Import the screen layout styles
+//import './styles/screens.css';  // Import the screen layout styles
+import './styles/global.css';
+
 
 
 const App = () => {

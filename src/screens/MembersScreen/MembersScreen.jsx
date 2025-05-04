@@ -1,4 +1,3 @@
-// src/screens/MembersScreen.jsx
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/DataTable/DataTable';
 import DataFormPopup from '../../components/DataFormPopup/DataFormPopup';
@@ -11,7 +10,7 @@ function MembersScreen() {
   const [showPopup, setShowPopup] = useState(false);
   const [mode, setMode] = useState('add'); // 'add' or 'edit'
 
-  // Fetch members on mount
+  // Load members
   useEffect(() => {
     fetch('http://localhost:5000/api/members')
       .then((r) => r.json())
@@ -19,12 +18,9 @@ function MembersScreen() {
       .catch(console.error);
   }, []);
 
-  // Unified save handler for both add and edit
+  // Unified save for add/edit
   const handleSave = () => {
     if (mode === 'add') {
-      if (!newMember.name || !newMember.dob) {
-        return alert('Please fill out both fields.');
-      }
       fetch('http://localhost:5000/api/members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -35,7 +31,7 @@ function MembersScreen() {
           setMembers((m) => [...m, data]);
           setShowPopup(false);
         })
-        .catch(() => alert('Failed to add member'));
+        .catch(() => alert('Failed to add'));
     } else {
       fetch(`http://localhost:5000/api/members/${editingMember.id}`, {
         method: 'PUT',
@@ -47,32 +43,28 @@ function MembersScreen() {
           setMembers((m) => m.map((x) => (x.id === data.id ? data : x)));
           setShowPopup(false);
         })
-        .catch(() => alert('Failed to update member'));
+        .catch(() => alert('Failed to update'));
     }
   };
 
-  // Delete handler
+  // Delete member
   const handleDelete = (id) => {
-    if (!window.confirm('Are you sure you want to delete this member?')) return;
+    if (!window.confirm('Are you sure?')) return;
     fetch(`http://localhost:5000/api/members/${id}`, { method: 'DELETE' })
       .then(() => setMembers((m) => m.filter((x) => x.id !== id)))
       .catch(console.error);
   };
 
-  // Table column definitions
   const columns = [
     { Header: 'Name', accessor: 'name' },
     { Header: 'Date of Birth', accessor: 'dob' },
   ];
 
   return (
-    <div className="screen-container">
-      <h1 className="screen-header">Members</h1>
-
+    <div className="main">
       <div className="button-container">
         <ActionButton
           label="Add New Member"
-          className="add-button"
           onClick={() => {
             setMode('add');
             setNewMember({ name: '', dob: '' });
@@ -89,7 +81,7 @@ function MembersScreen() {
         formData={mode === 'add' ? newMember : editingMember}
         setFormData={mode === 'add' ? setNewMember : setEditingMember}
         fields={[
-          { label: 'Name', name: 'name', type: 'text', placeholder: 'Enter Name' },
+          { label: 'Name', name: 'name', type: 'text', placeholder: 'Enter name' },
           { label: 'Date of Birth', name: 'dob', type: 'date', placeholder: '' },
         ]}
       />
@@ -97,9 +89,9 @@ function MembersScreen() {
       <DataTable
         columns={columns}
         data={members}
-        onEdit={(member) => {
+        onEdit={(row) => {
           setMode('edit');
-          setEditingMember(member);
+          setEditingMember(row);
           setShowPopup(true);
         }}
         onDelete={handleDelete}

@@ -1,11 +1,9 @@
 import React from 'react';
 
-const ActionButton = ({ label, onClick, className }) => {
-  return (
-    <button className={className} onClick={onClick}>
-      {label}
-    </button>
-  );
-};
+const ActionButton = ({ label, onClick, className = 'button button-primary' }) => (
+  <button className={className} onClick={onClick}>
+    {label}
+  </button>
+);
 
 export default ActionButton;

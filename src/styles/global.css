@@ -1,0 +1,155 @@
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #50e3c2;
+    --danger-color: #e94e77;
+    --bg-color: #f5f7fa;
+    --text-color: #333;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+  }
+  
+  .header {
+    height: 60px;
+    background: var(--primary-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .sidebar {
+    width: 240px;
+    background: #fff;
+    border-right: 1px solid #e0e0e0;
+    position: fixed;
+    top: 60px;
+    bottom: 0;
+    left: 0;
+    padding-top: 16px;
+  }
+  
+  .nav-item {
+    display: block;
+    padding: 12px 24px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .nav-item.active,
+  .nav-item:hover {
+    background: #f0f0f0;
+  }
+  
+  .main {
+    margin-left: 240px;
+    margin-top: 60px;
+    padding: 24px;
+  }
+  
+  .button,
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .button-primary {
+    background: var(--primary-color);
+    color: #fff;
+  }
+  
+  .button-secondary {
+    background: var(--secondary-color);
+    color: #fff;
+  }
+  
+  .button-danger {
+    background: var(--danger-color);
+    color: #fff;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-top: 16px;
+  }
+  
+  .data-table th {
+    background: var(--primary-color);
+    color: #fff;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .data-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .data-table tr:hover {
+    background: #f9fafb;
+  }
+  
+  .popup-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  
+  .popup {
+    background: #fff;
+    border-radius: 8px;
+    width: 360px;
+    max-width: 90%;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  
+  .form-field {
+    margin-bottom: 16px;
+  }
+  
+  .form-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  
+  .form-field input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccd0d5;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  
