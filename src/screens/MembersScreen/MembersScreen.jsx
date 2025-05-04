@@ -1,47 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import DataTable from '../../components/DataTable/DataTable';
 import DataFormPopup from '../../components/DataFormPopup/DataFormPopup';
 import ActionButton from '../../components/ActionButton/ActionButton';
+import SearchBox from '../../components/SearchBox/SearchBox';
 
 function MembersScreen() {
   const [members, setMembers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [newMember, setNewMember] = useState({ name: '', dob: '' });
   const [editingMember, setEditingMember] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [mode, setMode] = useState('add'); // 'add' or 'edit'
 
-  // Load members
+  // Fetch members on mount
   useEffect(() => {
     fetch('http://localhost:5000/api/members')
-      .then((r) => r.json())
+      .then((res) => res.json())
       .then(setMembers)
       .catch(console.error);
   }, []);
 
-  // Save (Add or Update)
+  // Filter as user types
+  const filteredMembers = useMemo(() => {
+    if (!searchTerm) return members;
+    const lower = searchTerm.toLowerCase();
+    return members.filter((m) =>
+      Object.values(m).some((val) =>
+        String(val || '').toLowerCase().includes(lower)
+      )
+    );
+  }, [members, searchTerm]);
+
+  // Add or edit save handler
   const handleSave = () => {
     const payload = mode === 'add' ? newMember : editingMember;
+    if (!payload.name) {
+      alert('Name is required.');
+      return;
+    }
     const url =
       mode === 'add'
         ? 'http://localhost:5000/api/members'
         : `http://localhost:5000/api/members/${editingMember.id}`;
     const method = mode === 'add' ? 'POST' : 'PUT';
 
-    // Only require name
-    if (!payload.name) return alert('Name is required.');
-
     fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
-      .then((res) => res.json())
+      .then((r) => r.json())
       .then((data) => {
-        if (mode === 'add') {
-          setMembers((m) => [...m, data]);
-        } else {
-          setMembers((m) => m.map((x) => (x.id === data.id ? data : x)));
-        }
+        setMembers((ms) =>
+          mode === 'add' ? [...ms, data] : ms.map((x) => (x.id === data.id ? data : x))
+        );
         setShowPopup(false);
       })
       .catch(() => alert('Failed to save'));
@@ -50,22 +62,24 @@ function MembersScreen() {
   // Delete
   const handleDelete = (id) => {
     if (!window.confirm('Are you sure?')) return;
-    fetch(`http://localhost:5000/api/members/${id}`, {
-      method: 'DELETE',
-    })
-      .then(() => setMembers((m) => m.filter((x) => x.id !== id)))
+    fetch(`http://localhost:5000/api/members/${id}`, { method: 'DELETE' })
+      .then(() => setMembers((ms) => ms.filter((x) => x.id !== id)))
       .catch(console.error);
   };
 
-  // Table columns
   const columns = [
     { Header: 'Name', accessor: 'name' },
-    { Header: 'Date of Birth', accessor: 'dob' }, // formatted in DataTable
+    { Header: 'Date of Birth', accessor: 'dob' },
   ];
 
   return (
     <div className="main">
       <div className="button-container">
+        <SearchBox
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search members..."
+        />
         <ActionButton
           label="Add New Member"
           onClick={() => {
@@ -84,24 +98,14 @@ function MembersScreen() {
         formData={mode === 'add' ? newMember : editingMember}
         setFormData={mode === 'add' ? setNewMember : setEditingMember}
         fields={[
-          {
-            label: 'Name',
-            name: 'name',
-            type: 'text',
-            placeholder: 'Enter name',
-          },
-          {
-            label: 'Date of Birth',
-            name: 'dob',
-            type: 'date',
-            placeholder: '',
-          },
+          { label: 'Name', name: 'name', type: 'text', placeholder: 'Enter name' },
+          { label: 'Date of Birth', name: 'dob', type: 'date', placeholder: '' },
         ]}
       />
 
       <DataTable
         columns={columns}
-        data={members}
+        data={filteredMembers}
         onEdit={(row) => {
           setMode('edit');
           setEditingMember(row);
