@@ -1,0 +1,36 @@
+/* src/components/DataFormPopup/DataFormPopup.css */
+
+/* Form field inputs and selects */
+.form-field input,
+.form-field select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccd0d5;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Focus state */
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: var(--primary-start);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* Label spacing */
+.form-field label {
+  margin-bottom: 8px;
+  display: block;
+  font-weight: 500;
+}
+
+/* Popup title spacing */
+.popup-title {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-start);
+}
