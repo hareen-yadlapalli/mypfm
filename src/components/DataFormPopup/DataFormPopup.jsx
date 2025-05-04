@@ -23,7 +23,11 @@ const DataFormPopup = ({
               type={field.type}
               name={field.name}
               placeholder={field.placeholder}
-              value={formData[field.name] || ''}
+              value={
+                field.type === 'date' && formData[field.name]
+                  ? formData[field.name].slice(0, 10) // YYYY-MM-DD
+                  : formData[field.name] || ''
+              }
               onChange={(e) =>
                 setFormData({ ...formData, [field.name]: e.target.value })
               }
@@ -32,16 +36,10 @@ const DataFormPopup = ({
         ))}
 
         <div className="modal-buttons">
-          <button
-            className="button button-primary"
-            onClick={onSave}
-          >
+          <button className="button button-primary" onClick={onSave}>
             {title.toLowerCase().includes('add') ? 'Save' : 'Update'}
           </button>
-          <button
-            className="button button-secondary"
-            onClick={onCancel}
-          >
+          <button className="button button-secondary" onClick={onCancel}>
             Cancel
           </button>
         </div>

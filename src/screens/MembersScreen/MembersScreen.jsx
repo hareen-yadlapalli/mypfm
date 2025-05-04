@@ -18,46 +18,49 @@ function MembersScreen() {
       .catch(console.error);
   }, []);
 
-  // Unified save for add/edit
+  // Save (Add or Update)
   const handleSave = () => {
-    if (mode === 'add') {
-      fetch('http://localhost:5000/api/members', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newMember),
-      })
-        .then((r) => r.json())
-        .then((data) => {
+    const payload = mode === 'add' ? newMember : editingMember;
+    const url =
+      mode === 'add'
+        ? 'http://localhost:5000/api/members'
+        : `http://localhost:5000/api/members/${editingMember.id}`;
+    const method = mode === 'add' ? 'POST' : 'PUT';
+
+    // Only require name
+    if (!payload.name) return alert('Name is required.');
+
+    fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (mode === 'add') {
           setMembers((m) => [...m, data]);
-          setShowPopup(false);
-        })
-        .catch(() => alert('Failed to add'));
-    } else {
-      fetch(`http://localhost:5000/api/members/${editingMember.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingMember),
-      })
-        .then((r) => r.json())
-        .then((data) => {
+        } else {
           setMembers((m) => m.map((x) => (x.id === data.id ? data : x)));
-          setShowPopup(false);
-        })
-        .catch(() => alert('Failed to update'));
-    }
+        }
+        setShowPopup(false);
+      })
+      .catch(() => alert('Failed to save'));
   };
 
-  // Delete member
+  // Delete
   const handleDelete = (id) => {
     if (!window.confirm('Are you sure?')) return;
-    fetch(`http://localhost:5000/api/members/${id}`, { method: 'DELETE' })
+    fetch(`http://localhost:5000/api/members/${id}`, {
+      method: 'DELETE',
+    })
       .then(() => setMembers((m) => m.filter((x) => x.id !== id)))
       .catch(console.error);
   };
 
+  // Table columns
   const columns = [
     { Header: 'Name', accessor: 'name' },
-    { Header: 'Date of Birth', accessor: 'dob' },
+    { Header: 'Date of Birth', accessor: 'dob' }, // formatted in DataTable
   ];
 
   return (
@@ -81,8 +84,18 @@ function MembersScreen() {
         formData={mode === 'add' ? newMember : editingMember}
         setFormData={mode === 'add' ? setNewMember : setEditingMember}
         fields={[
-          { label: 'Name', name: 'name', type: 'text', placeholder: 'Enter name' },
-          { label: 'Date of Birth', name: 'dob', type: 'date', placeholder: '' },
+          {
+            label: 'Name',
+            name: 'name',
+            type: 'text',
+            placeholder: 'Enter name',
+          },
+          {
+            label: 'Date of Birth',
+            name: 'dob',
+            type: 'date',
+            placeholder: '',
+          },
         ]}
       />
 
