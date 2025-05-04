@@ -1,147 +1,109 @@
+// src/screens/MembersScreen.jsx
 import React, { useState, useEffect } from 'react';
+import DataTable from '../../components/DataTable/DataTable';
+import DataFormPopup from '../../components/DataFormPopup/DataFormPopup';
+import ActionButton from '../../components/ActionButton/ActionButton';
 
 function MembersScreen() {
   const [members, setMembers] = useState([]);
   const [newMember, setNewMember] = useState({ name: '', dob: '' });
-  const [isEditing, setIsEditing] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [mode, setMode] = useState('add'); // 'add' or 'edit'
 
-  // Fetch members from the backend
+  // Fetch members on mount
   useEffect(() => {
     fetch('http://localhost:5000/api/members')
-      .then((response) => response.json())
-      .then((data) => setMembers(data));
+      .then((r) => r.json())
+      .then(setMembers)
+      .catch(console.error);
   }, []);
 
-  // Handle Add New Member
-  const handleAddMember = () => {
-    fetch('http://localhost:5000/api/members', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newMember),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setMembers([...members, data]);
-        setNewMember({ name: '', dob: '' });
-      });
-  };
-
-  // Handle Delete Member
-  const handleDeleteMember = (id) => {
-    if (window.confirm('Are you sure you want to delete this member?')) {
-      fetch(`http://localhost:5000/api/members/${id}`, {
-        method: 'DELETE',
+  // Unified save handler for both add and edit
+  const handleSave = () => {
+    if (mode === 'add') {
+      if (!newMember.name || !newMember.dob) {
+        return alert('Please fill out both fields.');
+      }
+      fetch('http://localhost:5000/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newMember),
       })
-        .then(() => {
-          setMembers(members.filter((member) => member.id !== id));
+        .then((r) => r.json())
+        .then((data) => {
+          setMembers((m) => [...m, data]);
+          setShowPopup(false);
         })
-        .catch((err) => console.error('Error deleting member:', err));
+        .catch(() => alert('Failed to add member'));
+    } else {
+      fetch(`http://localhost:5000/api/members/${editingMember.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingMember),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          setMembers((m) => m.map((x) => (x.id === data.id ? data : x)));
+          setShowPopup(false);
+        })
+        .catch(() => alert('Failed to update member'));
     }
   };
 
-  // Handle Edit Member
-  const handleEditClick = (member) => {
-    setIsEditing(true);
-    setEditingMember({ ...member });
+  // Delete handler
+  const handleDelete = (id) => {
+    if (!window.confirm('Are you sure you want to delete this member?')) return;
+    fetch(`http://localhost:5000/api/members/${id}`, { method: 'DELETE' })
+      .then(() => setMembers((m) => m.filter((x) => x.id !== id)))
+      .catch(console.error);
   };
 
-  // Handle Save Edited Member
-  const handleSaveEdit = () => {
-    fetch(`http://localhost:5000/api/members/${editingMember.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(editingMember),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setMembers(
-          members.map((member) =>
-            member.id === data.id ? { ...data } : member
-          )
-        );
-        setIsEditing(false);
-        setEditingMember(null);
-      });
-  };
+  // Table column definitions
+  const columns = [
+    { Header: 'Name', accessor: 'name' },
+    { Header: 'Date of Birth', accessor: 'dob' },
+  ];
 
   return (
-    <div>
-      <h1>Members</h1>
+    <div className="screen-container">
+      <h1 className="screen-header">Members</h1>
 
-      {/* Form for Adding a New Member */}
-      <div>
-        <h2>Add New Member</h2>
-        <input
-          type="text"
-          placeholder="Name"
-          value={newMember.name}
-          onChange={(e) =>
-            setNewMember({ ...newMember, name: e.target.value })
-          }
+      <div className="button-container">
+        <ActionButton
+          label="Add New Member"
+          className="add-button"
+          onClick={() => {
+            setMode('add');
+            setNewMember({ name: '', dob: '' });
+            setShowPopup(true);
+          }}
         />
-        <input
-          type="date"
-          value={newMember.dob}
-          onChange={(e) =>
-            setNewMember({ ...newMember, dob: e.target.value })
-          }
-        />
-        <button onClick={handleAddMember}>Add Member</button>
       </div>
 
-      {/* Displaying Members in a Table */}
-      <h2>Member List</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Date of Birth</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {members.map((member) => (
-            <tr key={member.id}>
-              <td>{member.name}</td>
-              <td>{member.dob}</td>
-              <td>
-                <button onClick={() => handleEditClick(member)}>Edit</button>
-                <button onClick={() => handleDeleteMember(member.id)}>
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <DataFormPopup
+        isOpen={showPopup}
+        onSave={handleSave}
+        onCancel={() => setShowPopup(false)}
+        title={mode === 'add' ? 'Add New Member' : 'Edit Member'}
+        formData={mode === 'add' ? newMember : editingMember}
+        setFormData={mode === 'add' ? setNewMember : setEditingMember}
+        fields={[
+          { label: 'Name', name: 'name', type: 'text', placeholder: 'Enter Name' },
+          { label: 'Date of Birth', name: 'dob', type: 'date', placeholder: '' },
+        ]}
+      />
 
-      {/* Edit Member Form */}
-      {isEditing && (
-        <div>
-          <h2>Edit Member</h2>
-          <input
-            type="text"
-            value={editingMember.name}
-            onChange={(e) =>
-              setEditingMember({ ...editingMember, name: e.target.value })
-            }
-          />
-          <input
-            type="date"
-            value={editingMember.dob}
-            onChange={(e) =>
-              setEditingMember({ ...editingMember, dob: e.target.value })
-            }
-          />
-          <button onClick={handleSaveEdit}>Save</button>
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={members}
+        onEdit={(member) => {
+          setMode('edit');
+          setEditingMember(member);
+          setShowPopup(true);
+        }}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }
