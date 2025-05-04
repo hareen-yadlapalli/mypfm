@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useLocation } from 'react-router-dom';
 import SearchBox from '../SearchBox/SearchBox';
 import AdvancedSearch from '../AdvancedSearch/AdvancedSearch';
 import DataTable from '../DataTable/DataTable';
@@ -12,40 +13,34 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
 const CRUDScreen = ({
-  title,
   endpoint,
   fields,
   idField = 'id',
   transformFetch = data => data,
 }) => {
-  // Data state
+  // Data and UI state
   const [items, setItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [criteria, setCriteria] = useState([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
-
-  // Form state
   const [formData, setFormData] = useState({});
   const [editingItem, setEditingItem] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [mode, setMode] = useState('add');
-
-  // Sorting defaults to ID ascending
   const [sortField, setSortField] = useState(idField);
   const [sortOrder, setSortOrder] = useState('asc');
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Export menu
+  // Export/import menu
   const [showExportMenu, setShowExportMenu] = useState(false);
   const exportRef = useRef();
-
-  // File input ref for import
   const fileInputRef = useRef();
 
-  // Fetch items once
+  // Sidebar active state (no on-screen title)
+  const location = useLocation();
+
+  // Fetch initial data
   useEffect(() => {
     fetch(endpoint)
       .then(res => res.json())
@@ -53,7 +48,7 @@ const CRUDScreen = ({
       .catch(console.error);
   }, [endpoint, transformFetch]);
 
-  // Simple filter
+  // Simple search filter
   const simpleFiltered = useMemo(() => {
     if (!searchTerm) return items;
     const lower = searchTerm.toLowerCase();
@@ -70,7 +65,7 @@ const CRUDScreen = ({
         if (!value) return true;
         const rec = item[field];
         const def = fields.find(f => f.name === field);
-        if (def.type === 'date') {
+        if (def?.type === 'date') {
           const rd = new Date(rec).setHours(0,0,0,0);
           const qd = new Date(value).setHours(0,0,0,0);
           if (operator === 'on') return rd === qd;
@@ -89,7 +84,7 @@ const CRUDScreen = ({
     );
   }, [simpleFiltered, criteria, fields]);
 
-  // Global sort
+  // Global sorting
   const sortedData = useMemo(() => {
     const arr = [...filtered];
     arr.sort((a, b) => {
@@ -121,19 +116,24 @@ const CRUDScreen = ({
     return sortedData.slice(start, start + pageSize);
   }, [sortedData, currentPage, pageSize]);
 
-  // Handlers
+  // Sort handler
   const handleSort = field => {
-    if (sortField === field) setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    else {
+    if (sortField === field) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
       setSortField(field);
       setSortOrder('asc');
     }
     setCurrentPage(1);
   };
 
+  // Save (create/update)
   const handleSave = () => {
     const payload = mode === 'add' ? formData : editingItem;
-    if (!payload[fields[0].name]?.toString().trim()) return alert(`${fields[0].label} is required.`);
+    if (!payload[fields[0].name]?.toString().trim()) {
+      alert(`${fields[0].label} is required.`);
+      return;
+    }
     const url = mode === 'add' ? endpoint : `${endpoint}/${editingItem[idField]}`;
     const method = mode === 'add' ? 'POST' : 'PUT';
     fetch(url, {
@@ -144,22 +144,22 @@ const CRUDScreen = ({
       .then(res => (res.ok ? res.json() : Promise.reject()))
       .then(data => {
         setItems(list => {
-          let newList;
-          if (mode === 'add') newList = [...list, data];
-          else newList = list.map(i => (i[idField] === data[idField] ? data : i));
+          const updated = mode === 'add' ? [...list, data] : list.map(i => i[idField] === data[idField] ? data : i);
           // re-sort
-          return [...newList].sort((a, b) => {
-            const def = fields.find(f => f.name === sortField);
-            let aVal = a[sortField] ?? '';
-            let bVal = b[sortField] ?? '';
-            if (def?.type === 'date') {
-              aVal = new Date(aVal).getTime();
-              bVal = new Date(bVal).getTime();
+          return [...updated].sort((x, y) => {
+            const df = fields.find(f => f.name === sortField);
+            let xv = x[sortField] ?? '';
+            let yv = y[sortField] ?? '';
+            if (df?.type === 'date') {
+              xv = new Date(xv).getTime();
+              yv = new Date(yv).getTime();
             }
-            if (!isNaN(aVal) && !isNaN(bVal)) return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+            if (!isNaN(xv) && !isNaN(yv)) {
+              return sortOrder === 'asc' ? xv - yv : yv - xv;
+            }
             return sortOrder === 'asc'
-              ? String(aVal).localeCompare(String(bVal))
-              : String(bVal).localeCompare(String(aVal));
+              ? String(xv).localeCompare(String(yv))
+              : String(yv).localeCompare(String(xv));
           });
         });
         setShowPopup(false);
@@ -167,57 +167,54 @@ const CRUDScreen = ({
       .catch(() => alert('Failed to save.'));
   };
 
+  // Delete handler
   const handleDelete = id => {
-    if (!window.confirm(`Delete this ${title.slice(0, -1)}?`)) return;
+    if (!window.confirm('Delete this record?')) return;
     fetch(`${endpoint}/${id}`, { method: 'DELETE' })
       .then(res => (res.ok ? setItems(list => list.filter(i => i[idField] !== id)) : Promise.reject()))
       .catch(() => alert('Failed to delete.'));
   };
 
+  // Export/Import utilities (as previously implemented)
   const exportCols = useMemo(() => [idField, ...fields.map(f => f.name)], [idField, fields]);
-
   const getExportArray = () => sortedData.map(item => {
     const obj = {};
-    exportCols.forEach(col => (obj[col] = item[col]));
+    exportCols.forEach(c => { obj[c] = item[c]; });
     return obj;
   });
 
   const handleExport = type => {
     const arr = getExportArray();
     const ws = XLSX.utils.json_to_sheet(arr, { header: exportCols });
-    const colDefs = ws['!cols'] || [];
-    colDefs[0] = { locked: true };
-    ws['!cols'] = colDefs;
+    ws['!cols'] = [{ locked: true }];
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, title);
-    if (type === 'csv') XLSX.writeFile(wb, `${title}.csv`);
-    else if (type === 'excel') XLSX.writeFile(wb, `${title}.xlsx`);
-    else if (type === 'pdf') {
+    XLSX.utils.book_append_sheet(wb, ws, 'Data');
+    const base = location.pathname.slice(1) || 'data';
+    if (type === 'csv') XLSX.writeFile(wb, `${base}.csv`);
+    if (type === 'excel') XLSX.writeFile(wb, `${base}.xlsx`);
+    if (type === 'pdf') {
       const doc = new jsPDF();
-      const headerLabels = exportCols.map(col => fields.find(f => f.name === col)?.label ?? col);
-      const bodyData = arr.map(row => exportCols.map(col => row[col]));
-      doc.autoTable({ head: [headerLabels], body: bodyData });
-      doc.save(`${title}.pdf`);
+      doc.autoTable({ head: [exportCols], body: arr.map(r => exportCols.map(c => r[c])) });
+      doc.save(`${base}.pdf`);
     }
     setShowExportMenu(false);
   };
 
   const handleDownloadTemplate = () => {
-    const headers = exportCols.reduce((acc, col) => ({ ...acc, [col]: '' }), {});
+    const headers = exportCols.reduce((o, c) => ({ ...o, [c]: '' }), {});
     const ws = XLSX.utils.json_to_sheet([headers]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Template');
-    XLSX.writeFile(wb, `${title}_template.xlsx`);
+    const base = location.pathname.slice(1) || 'data';
+    XLSX.writeFile(wb, `${base}_template.xlsx`);
   };
 
   const handleFileChange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = evt => {
       const wb = XLSX.read(evt.target.result, { type: 'array' });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
       rows.forEach(row => {
         const id = row[idField];
         const url = id ? `${endpoint}/${id}` : endpoint;
@@ -230,9 +227,7 @@ const CRUDScreen = ({
           .then(res => res.json())
           .then(data => setItems(list => {
             const exists = list.find(i => i[idField] === data[idField]);
-            return exists
-              ? list.map(i => (i[idField] === data[idField] ? data : i))
-              : [...list, data];
+            return exists ? list.map(i => i[idField] === data[idField] ? data : i) : [...list, data];
           }))
           .catch(console.error);
       });
@@ -244,21 +239,21 @@ const CRUDScreen = ({
   // Render
   return (
     <div className="main">
-      <h2>{title}</h2>
       <div className="button-container" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <SearchBox value={searchTerm} onChange={setSearchTerm} placeholder={`Search ${title.toLowerCase()}...`} />
+          <SearchBox value={searchTerm} onChange={setSearchTerm} placeholder="Search..." />
           <button className="button button-secondary" onClick={() => setShowAdvanced(v => !v)}>
             {showAdvanced ? 'Hide Advanced' : 'Advanced Search'}
           </button>
-          {/* Add/Edit popup trigger */}
-          <ActionButton label={`Add New ${title.slice(0, -1)}`} onClick={() => {
-            setMode('add');
-            setFormData(fields.reduce((acc,f)=>({ ...acc, [f.name]: '' }), {}));
-            setShowPopup(true);
-          }} />
-          {/* Export dropdown */}
-          <div style={{ position: 'relative' }} ref={exportRef}>
+          <ActionButton
+            label="Add New"
+            onClick={() => {
+              setMode('add');
+              setFormData(fields.reduce((a, f) => ({ ...a, [f.name]: '' }), {}));
+              setShowPopup(true);
+            }}
+          />
+          <div ref={exportRef} style={{ position: 'relative' }}>
             <ActionButton label="Export" onClick={() => setShowExportMenu(v => !v)} />
             {showExportMenu && (
               <div style={{ position: 'absolute', top: '100%', right: 0, background: '#fff', boxShadow: '0 2px 6px rgba(0,0,0,0.2)', zIndex: 10 }}>
@@ -270,15 +265,12 @@ const CRUDScreen = ({
               </div>
             )}
           </div>
-          {/* Template download */}
-          <ActionButton label="Template" onClick={handleDownloadTemplate} />
-          {/* Import file */}
           <label className="button button-secondary" style={{ cursor: 'pointer' }}>
             Import
             <input type="file" accept=".xlsx,.csv" onChange={handleFileChange} style={{ display: 'none' }} />
           </label>
+          <ActionButton label="Template" onClick={handleDownloadTemplate} />
         </div>
-        {/* Pagination controls */}
         <div className="pagination" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button className="button" onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
             Back
@@ -302,26 +294,22 @@ const CRUDScreen = ({
                 setCurrentPage(1);
               }
             }}
+            className="search-box"
             style={{ width: '60px' }}
             title="Results per page"
           />
         </div>
       </div>
-
       {showAdvanced && <AdvancedSearch fields={fields} onSearch={setCriteria} onReset={() => setCriteria([])} />}
-
-      {/* Add/Edit form popup */}
       <DataFormPopup
         isOpen={showPopup}
         onSave={handleSave}
         onCancel={() => setShowPopup(false)}
-        title={mode === 'add' ? `Add New ${title.slice(0, -1)}` : `Edit ${title.slice(0, -1)}`}
+        title={mode === 'add' ? 'Add New' : 'Edit'}
         formData={mode === 'add' ? formData : editingItem}
         setFormData={mode === 'add' ? setFormData : setEditingItem}
         fields={fields.map(f => ({ ...f, placeholder: f.label }))}
       />
-
-      {/* Data table with scroll */}
       <div style={{ overflowY: 'auto', maxHeight: '60vh' }}>
         <DataTable
           columns={fields.map(f => ({ Header: f.label, accessor: f.name, canSort: true }))}
@@ -333,12 +321,9 @@ const CRUDScreen = ({
             setMode('edit');
             const copy = { ...row };
             fields.forEach(f => {
-              if (f.type === 'date' && copy[f.name]) {
-                copy[f.name] = copy[f.name].split('T')[0];
-              }
+              if (f.type === 'date' && copy[f.name]) copy[f.name] = copy[f.name].split('T')[0];
             });
             setEditingItem(copy);
-            setFormData(null);
             setShowPopup(true);
           }}
           onDelete={handleDelete}
@@ -349,7 +334,6 @@ const CRUDScreen = ({
 };
 
 CRUDScreen.propTypes = {
-  title: PropTypes.string.isRequired,
   endpoint: PropTypes.string.isRequired,
   fields: PropTypes.array.isRequired,
   idField: PropTypes.string,

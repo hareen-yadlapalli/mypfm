@@ -267,4 +267,12 @@
   .advanced-search > div {
     /* empty */
   }
-  
+
+  .screen-title {
+    font-size: 1.75rem;           /* ~28px */
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--primary-start);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
