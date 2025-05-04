@@ -1,4 +1,7 @@
+// src/components/AdvancedSearch/AdvancedSearch.jsx
+
 import React, { useState } from 'react';
+import './AdvancedSearch.css';
 
 const operatorsByType = {
   text: [
@@ -14,11 +17,13 @@ const operatorsByType = {
   ],
 };
 
+const getOperators = (type) => operatorsByType[type] || operatorsByType.text;
+
 const AdvancedSearch = ({ fields, onSearch, onReset }) => {
   const [criteria, setCriteria] = useState([
     {
       field: fields[0].name,
-      operator: operatorsByType[fields[0].type][0].value,
+      operator: getOperators(fields[0].type)[0].value,
       value: '',
     },
   ]);
@@ -27,7 +32,11 @@ const AdvancedSearch = ({ fields, onSearch, onReset }) => {
     const first = fields[0];
     setCriteria((c) => [
       ...c,
-      { field: first.name, operator: operatorsByType[first.type][0].value, value: '' },
+      {
+        field: first.name,
+        operator: getOperators(first.type)[0].value,
+        value: '',
+      },
     ]);
   };
 
@@ -36,11 +45,12 @@ const AdvancedSearch = ({ fields, onSearch, onReset }) => {
   };
 
   const updateField = (idx, field) => {
-    const type = fields.find((f) => f.name === field).type;
+    const def = fields.find((f) => f.name === field);
+    const ops = getOperators(def.type);
     setCriteria((c) =>
       c.map((row, i) =>
         i === idx
-          ? { field, operator: operatorsByType[type][0].value, value: '' }
+          ? { field, operator: ops[0].value, value: '' }
           : row
       )
     );
@@ -53,81 +63,91 @@ const AdvancedSearch = ({ fields, onSearch, onReset }) => {
   };
 
   const updateValue = (idx, val) => {
-    setCriteria((c) => c.map((row, i) => (i === idx ? { ...row, value: val } : row)));
-  };
-
-  const handleSearch = () => onSearch(criteria);
-  const handleReset = () => {
-    setCriteria([{ field: fields[0].name, operator: operatorsByType[fields[0].type][0].value, value: '' }]);
-    onReset();
+    setCriteria((c) =>
+      c.map((row, i) => (i === idx ? { ...row, value: val } : row))
+    );
   };
 
   return (
     <div className="advanced-search">
       {criteria.map((row, idx) => {
         const def = fields.find((f) => f.name === row.field);
-        const ops = operatorsByType[def.type];
-        const isLast = idx === criteria.length - 1;
-
+        const ops = getOperators(def.type);
         return (
           <React.Fragment key={idx}>
-            <select value={row.field} onChange={(e) => updateField(idx, e.target.value)}>
+            <select
+              value={row.field}
+              onChange={(e) => updateField(idx, e.target.value)}
+            >
               {fields.map((f) => (
                 <option key={f.name} value={f.name}>
                   {f.label}
                 </option>
               ))}
             </select>
-
-            <select value={row.operator} onChange={(e) => updateOperator(idx, e.target.value)}>
+            <select
+              value={row.operator}
+              onChange={(e) => updateOperator(idx, e.target.value)}
+            >
               {ops.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
               ))}
             </select>
-
             <input
               type={def.type === 'date' ? 'date' : 'text'}
               value={row.value}
               onChange={(e) => updateValue(idx, e.target.value)}
             />
-
-            <div className="action-cell">
-              {/* always show remove */}
+            {idx === criteria.length - 1 ? (
+              <button
+                className="button button-secondary small"
+                onClick={addRow}
+                style={{ gridColumn: 4 }}
+              >
+                ＋
+              </button>
+            ) : (
               <button
                 className="button button-danger small"
                 onClick={() => removeRow(idx)}
-                title="Remove condition"
+                style={{ gridColumn: 4 }}
               >
                 ×
               </button>
-
-              {/* only on last row, show add */}
-              {isLast && (
-                <button
-                  className="button button-secondary small"
-                  onClick={addRow}
-                  title="Add condition"
-                >
-                  ＋
-                </button>
-              )}
-            </div>
+            )}
           </React.Fragment>
         );
       })}
 
       {/* Footer row: Search under Field, Reset under Operator */}
       <React.Fragment>
-        <button className="button button-primary" onClick={handleSearch}>
+        <button
+          className="button button-primary"
+          onClick={() => onSearch(criteria)}
+          style={{ gridColumn: 1 }}
+        >
           Search
         </button>
-        <button className="button button-secondary" onClick={handleReset}>
+        <button
+          className="button button-secondary"
+          onClick={() => {
+            setCriteria([
+              {
+                field: fields[0].name,
+                operator: getOperators(fields[0].type)[0].value,
+                value: '',
+              },
+            ]);
+            onReset();
+          }}
+          style={{ gridColumn: 2 }}
+        >
           Reset
         </button>
-        <div /> {/* placeholder under Value */}
-        <div /> {/* placeholder under Action */}
+        <div />
+        <div />
       </React.Fragment>
     </div>
   );

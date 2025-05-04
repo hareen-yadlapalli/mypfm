@@ -4,7 +4,7 @@ import React from 'react';
 import CRUDScreen from '../../components/CRUDScreen/CRUDScreen';
 
 const fields = [
-  { label: 'Type',        name: 'type',         type: 'text'   },
+  { label: 'Type', name: 'type', type: 'select', options: ['Savings', 'Current', 'Loan', 'Credit Card'] },
   { label: 'BSB',         name: 'bsb',          type: 'text'   },
   { label: 'Account No.', name: 'accountno',    type: 'text'   },
   { label: 'Provider',    name: 'provider',     type: 'text'   },

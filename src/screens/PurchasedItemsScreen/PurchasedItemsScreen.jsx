@@ -1,9 +1,22 @@
-import React from 'react'
+// src/screens/PurchasedItemsScreen/PurchasedItemsScreen.jsx
 
-function PurchasedItemsScreen() {
+import React from 'react';
+import CRUDScreen from '../../components/CRUDScreen/CRUDScreen';
+
+const fieldsItems = [
+  { label: 'Purchase ID',  name: 'purchaseid', type: 'number' },
+  { label: 'Volume Units', name: 'volunits',    type: 'text'   },
+  { label: 'Quantity',     name: 'qty',          type: 'number' },
+  { label: 'Price',        name: 'price',        type: 'number' },
+  { label: 'Cost/Unit',    name: 'costperunit',  type: 'number' },
+];
+
+export default function PurchasedItemsScreen() {
   return (
-    <div>PurchasedItemsScreen</div>
-  )
+    <CRUDScreen
+      endpoint="http://localhost:5000/api/purchaseditems"
+      fields={fieldsItems}
+      idField="id"
+    />
+  );
 }
-
-export default PurchasedItemsScreen

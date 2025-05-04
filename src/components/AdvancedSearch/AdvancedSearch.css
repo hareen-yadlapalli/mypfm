@@ -1,0 +1,59 @@
+/* src/components/AdvancedSearch/AdvancedSearch.css */
+
+.advanced-search {
+    display: grid;
+    /* Field, Operator, Value, Action columns */
+    grid-template-columns: 160px 120px 200px 48px;
+    gap: 8px;
+    background: var(--card-bg);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--shadow);
+    margin-bottom: 16px;
+    grid-auto-flow: row;
+  }
+  
+  .advanced-search select,
+  .advanced-search input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccd0d5;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  
+  .advanced-search select:focus,
+  .advanced-search input:focus {
+    outline: none;
+    border-color: var(--primary-start);
+  }
+  
+  .advanced-search button.small {
+    /* Small square buttons for add/remove icons */
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .advanced-search button.small:hover {
+    background: var(--sidebar-hover);
+    color: #fff;
+  }
+  
+  .advanced-search > button.button-primary:not(.small) {
+    grid-column: 1;
+    justify-self: start;
+  }
+  
+  .advanced-search > button.button-secondary:not(.small) {
+    grid-column: 2;
+    justify-self: start;
+  }
+  
