@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 
 const formatDate = (isoString) => {
   if (!isoString) return '';
@@ -12,44 +12,86 @@ const formatDate = (isoString) => {
   return parts.join('-');
 };
 
-const DataTable = ({ columns, data, onEdit, onDelete }) => (
-  <table className="data-table">
-    <thead>
-      <tr>
-        {columns.map(col => (
-          <th key={col.accessor}>{col.Header}</th>
-        ))}
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {data.map(row => (
-        <tr key={row.id}>
-          {columns.map(col => (
-            <td key={col.accessor}>
-              {col.accessor === 'dob' ? formatDate(row.dob) : row[col.accessor]}
-            </td>
+const DataTable = ({ columns, data, onEdit, onDelete }) => {
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return data;
+    const sorted = [...data].sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+      // if sorting by 'dob', compare as dates
+      if (sortConfig.key === 'dob') {
+        aVal = aVal ? new Date(aVal) : new Date(0);
+        bVal = bVal ? new Date(bVal) : new Date(0);
+      }
+      if (aVal < bVal) return sortConfig.direction === 'ascending' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'ascending' ? 1 : -1;
+      return 0;
+    });
+    return sorted;
+  }, [data, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIndicator = (key) => {
+    if (sortConfig.key !== key) return '';
+    return sortConfig.direction === 'ascending' ? ' ▲' : ' ▼';
+  };
+
+  return (
+    <table className="data-table">
+      <thead>
+        <tr>
+          {columns.map((col) => (
+            <th
+              key={col.accessor}
+              onClick={() => requestSort(col.accessor)}
+              className="sortable"
+            >
+              {col.Header}{getSortIndicator(col.accessor)}
+            </th>
           ))}
-          <td>
-            <div className="action-buttons">
-              <button
-                className="button button-secondary"
-                onClick={() => onEdit(row)}
-              >
-                Edit
-              </button>
-              <button
-                className="button button-danger"
-                onClick={() => onDelete(row.id)}
-              >
-                Delete
-              </button>
-            </div>
-          </td>
+          <th>Actions</th>
         </tr>
-      ))}
-    </tbody>
-  </table>
-);
+      </thead>
+      <tbody>
+        {sortedData.map((row) => (
+          <tr key={row.id}>
+            {columns.map((col) => (
+              <td key={col.accessor}>
+                {col.accessor === 'dob'
+                  ? formatDate(row.dob)
+                  : row[col.accessor]}
+              </td>
+            ))}
+            <td>
+              <div className="action-buttons">
+                <button
+                  className="button button-secondary"
+                  onClick={() => onEdit(row)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="button button-danger"
+                  onClick={() => onDelete(row.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
 
 export default DataTable;

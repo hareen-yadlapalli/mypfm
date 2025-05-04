@@ -130,6 +130,18 @@
     padding: 12px;
     text-align: left;
   }
+
+  /* Make headers clickable for sorting */
+.data-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  /* Slight padding so the ▲/▼ indicator doesn't overlap text */
+  .data-table th {
+    position: relative;
+    padding-right: 24px;
+  }
   
   .data-table td {
     padding: 12px;
