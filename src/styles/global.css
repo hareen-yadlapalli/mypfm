@@ -59,8 +59,8 @@
     grid-row: 2 / 3;
     background: var(--sidebar-bg);
     overflow-y: auto;
-    display: flex;              /* ensures full-height */
-    flex-direction: column;     /* stacks nav items top to bottom */
+    display: flex;
+    flex-direction: column;
   }
   
   /* NAV ITEMS */
@@ -113,7 +113,7 @@
     box-shadow: 0 2px 4px var(--shadow);
   }
   
-  /* TABLE */
+  /* TABLE CARD */
   .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -130,17 +130,26 @@
     padding: 12px;
     text-align: left;
   }
-
-  /* Make headers clickable for sorting */
-.data-table th.sortable {
+  
+  .data-table th.sortable {
+    position: relative;
+    padding-right: 24px;
     cursor: pointer;
     user-select: none;
   }
   
-  /* Slight padding so the ▲/▼ indicator doesn't overlap text */
-  .data-table th {
-    position: relative;
-    padding-right: 24px;
+  .data-table th .header-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .data-table .sort-indicator {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #fff;
   }
   
   .data-table td {
@@ -152,7 +161,7 @@
     background: #f0f4f8;
   }
   
-  /* ACTION BUTTONS IN TABLE */
+  /* ACTION BUTTONS */
   .action-buttons {
     display: flex;
     gap: 8px;
@@ -161,8 +170,10 @@
   /* MODAL BACKDROP */
   .popup-backdrop {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0,0,0,0.3);
     display: flex;
     align-items: center;

@@ -3,12 +3,14 @@ import React, { useState, useMemo } from 'react';
 const formatDate = (isoString) => {
   if (!isoString) return '';
   const date = new Date(isoString);
-  const parts = date.toLocaleDateString('en-AU', {
-    day:   '2-digit',
-    month: 'short',
-    year:  'numeric',
-    timeZone: 'Australia/Sydney'
-  }).split(' ');
+  const parts = date
+    .toLocaleDateString('en-AU', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'Australia/Sydney',
+    })
+    .split(' ');
   return parts.join('-');
 };
 
@@ -20,7 +22,6 @@ const DataTable = ({ columns, data, onEdit, onDelete }) => {
     const sorted = [...data].sort((a, b) => {
       let aVal = a[sortConfig.key];
       let bVal = b[sortConfig.key];
-      // if sorting by 'dob', compare as dates
       if (sortConfig.key === 'dob') {
         aVal = aVal ? new Date(aVal) : new Date(0);
         bVal = bVal ? new Date(bVal) : new Date(0);
@@ -40,9 +41,9 @@ const DataTable = ({ columns, data, onEdit, onDelete }) => {
     setSortConfig({ key, direction });
   };
 
-  const getSortIndicator = (key) => {
-    if (sortConfig.key !== key) return '';
-    return sortConfig.direction === 'ascending' ? ' ▲' : ' ▼';
+  const getIndicator = (key) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
 
   return (
@@ -52,10 +53,13 @@ const DataTable = ({ columns, data, onEdit, onDelete }) => {
           {columns.map((col) => (
             <th
               key={col.accessor}
-              onClick={() => requestSort(col.accessor)}
               className="sortable"
+              onClick={() => requestSort(col.accessor)}
             >
-              {col.Header}{getSortIndicator(col.accessor)}
+              <div className="header-content">
+                {col.Header}
+                <span className="sort-indicator">{getIndicator(col.accessor)}</span>
+              </div>
             </th>
           ))}
           <th>Actions</th>
