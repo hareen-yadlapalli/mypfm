@@ -27,6 +27,10 @@ const CRUDScreen = ({
   const [showPopup, setShowPopup] = useState(false);
   const [mode, setMode] = useState('add');
 
+  // Sorting state
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -75,18 +79,54 @@ const CRUDScreen = ({
     );
   }, [simpleFiltered, criteria, fields]);
 
+  // Global sorting
+  const sortedData = useMemo(() => {
+    if (!sortField) return filtered;
+    const arr = [...filtered];
+    arr.sort((a, b) => {
+      const aVal = a[sortField] ?? '';
+      const bVal = b[sortField] ?? '';
+      const def = fields.find(f => f.name === sortField);
+      // date sort
+      if (def && def.type === 'date') {
+        const aTime = new Date(aVal).getTime();
+        const bTime = new Date(bVal).getTime();
+        return sortOrder === 'asc' ? aTime - bTime : bTime - aTime;
+      }
+      // numeric
+      if (!isNaN(aVal) && !isNaN(bVal)) {
+        return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+      // string
+      return sortOrder === 'asc'
+        ? String(aVal).localeCompare(String(bVal))
+        : String(bVal).localeCompare(String(aVal));
+    });
+    return arr;
+  }, [filtered, sortField, sortOrder, fields]);
+
   // Pagination calculations
-  const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+  const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
   const pageNumbers = [];
   const startPage = Math.max(1, currentPage - 4);
   const endPage = Math.min(totalPages, startPage + 9);
-  for (let i = startPage; i <= endPage; i++) {
-    pageNumbers.push(i);
-  }
+  for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
+
   const pagedData = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return filtered.slice(start, start + pageSize);
-  }, [filtered, currentPage, pageSize]);
+    return sortedData.slice(start, start + pageSize);
+  }, [sortedData, currentPage, pageSize]);
+
+  // Sort handler
+  const handleSort = field => {
+    if (sortField === field) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+    setCurrentPage(1);
+  };
 
   // Save handler
   const handleSave = () => {
@@ -102,13 +142,13 @@ const CRUDScreen = ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
-      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(res => (res.ok ? res.json() : Promise.reject()))
       .then(data => {
         const updated = transformFetch(Array.isArray(data) ? data : [data])[0];
         setItems(list =>
           mode === 'add'
             ? [...list, updated]
-            : list.map(i => i[idField] === updated[idField] ? updated : i)
+            : list.map(i => (i[idField] === updated[idField] ? updated : i))
         );
         setShowPopup(false);
       })
@@ -119,11 +159,15 @@ const CRUDScreen = ({
   const handleDelete = id => {
     if (!window.confirm(`Delete this ${title.slice(0, -1)}?`)) return;
     fetch(`${endpoint}/${id}`, { method: 'DELETE' })
-      .then(res => res.ok ? setItems(list => list.filter(i => i[idField] !== id)) : Promise.reject())
+      .then(res => (res.ok ? setItems(list => list.filter(i => i[idField] !== id)) : Promise.reject()))
       .catch(() => alert('Failed to delete.'));
   };
 
-  const columns = fields.map(f => ({ Header: f.label, accessor: f.name }));
+  const columns = fields.map(f => ({
+    Header: f.label,
+    accessor: f.name,
+    canSort: true,
+  }));
 
   return (
     <div className="main">
@@ -146,9 +190,20 @@ const CRUDScreen = ({
             <button key={n} className={`button ${n===currentPage?'button-primary':''}`} onClick={() => setCurrentPage(n)}>{n}</button>
           ))}
           <button className="button" onClick={() => setCurrentPage(p => Math.min(p+1,totalPages))} disabled={currentPage===totalPages}>Next</button>
-          <select value={pageSize} onChange={e=>{setPageSize(Number(e.target.value)); setCurrentPage(1);}}>
-            {[5,10,25,50,100].map(n=> <option key={n} value={n}>{n}/page</option>)}
-          </select>
+          <input
+            type="number"
+            min={1}
+            value={pageSize}
+            onChange={e => {
+              const v = Number(e.target.value);
+              if (v > 0) {
+                setPageSize(v);
+                setCurrentPage(1);
+              }
+            }}
+            style={{ width: '60px' }}
+            title="Results per page"
+          />
         </div>
       </div>
       {showAdvanced && <AdvancedSearch fields={fields} onSearch={setCriteria} onReset={() => setCriteria([])} />}
@@ -163,13 +218,21 @@ const CRUDScreen = ({
         fields={fields.map(f => ({ ...f, placeholder: f.label }))}
       />
 
-      <DataTable columns={columns} data={pagedData} onEdit={row => {
-        setMode('edit');
-        const copy = { ...row };
-        fields.forEach(f => f.type === 'date' && copy[f.name] && (copy[f.name] = copy[f.name].split('T')[0]));
-        setEditingItem(copy);
-        setShowPopup(true);
-      }} onDelete={handleDelete} />
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        sortField={sortField}
+        sortOrder={sortOrder}
+        onSort={handleSort}
+        onEdit={row => {
+          setMode('edit');
+          const copy = { ...row };
+          fields.forEach(f => f.type === 'date' && copy[f.name] && (copy[f.name] = copy[f.name].split('T')[0]));
+          setEditingItem(copy);
+          setShowPopup(true);
+        }}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };
