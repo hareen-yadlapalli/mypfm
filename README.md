@@ -68,3 +68,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+search button to be below column dropdown, reset button to be below condition column, add condition button should not be that big, same as previoius size, delete button is also same, after input, delete button, then add condition, add condition only on last search row
+
+Advanced search option after search box, and then add members box
+advanced search section to appear only on advanced search box
+when advanced search is displayed, that button to appear as hide advanced search and when clicked hide advanced search
+gap between search and advanced search

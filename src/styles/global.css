@@ -1,5 +1,6 @@
 /* src/styles/global.css */
 
+/* Color & spacing variables */
 :root {
     --primary-start: #4a90e2;
     --primary-end:   #50e3c2;
@@ -12,6 +13,7 @@
     --shadow:        rgba(0, 0, 0, 0.1);
   }
   
+  /* Reset & box sizing */
   *,
   *::before,
   *::after {
@@ -20,6 +22,7 @@
     padding: 0;
   }
   
+  /* Full-height layout */
   html,
   body {
     height: 100%;
@@ -29,6 +32,7 @@
     color: var(--text-color);
   }
   
+  /* CSS Grid for overall layout */
   .app-container {
     display: grid;
     grid-template-rows: 60px 1fr;
@@ -42,11 +46,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(
-      to right,
-      var(--primary-start),
-      var(--primary-end)
-    );
+    background: linear-gradient(to right, var(--primary-start), var(--primary-end));
     color: #fff;
     font-size: 20px;
     font-weight: 500;
@@ -58,9 +58,9 @@
     grid-column: 1 / 2;
     grid-row: 2 / 3;
     background: var(--sidebar-bg);
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
   }
   
   /* NAV ITEMS */
@@ -70,7 +70,6 @@
     text-decoration: none;
     font-size: 14px;
   }
-  
   .nav-item:hover,
   .nav-item.active {
     background: var(--sidebar-hover);
@@ -85,7 +84,7 @@
     background: var(--bg-color);
   }
   
-  /* BUTTONS */
+  /* GENERIC BUTTONS */
   .button,
   button {
     font-size: 14px;
@@ -94,26 +93,23 @@
     border-radius: 4px;
     cursor: pointer;
   }
-  
   .button-primary {
     background: var(--primary-start);
     color: #fff;
     box-shadow: 0 2px 4px var(--shadow);
   }
-  
   .button-secondary {
     background: var(--primary-end);
     color: #fff;
     box-shadow: 0 2px 4px var(--shadow);
   }
-  
   .button-danger {
     background: #e74c3c;
     color: #fff;
     box-shadow: 0 2px 4px var(--shadow);
   }
   
-  /* SEARCH BOX */
+  /* SIMPLE SEARCH BOX */
   .search-box {
     padding: 8px 12px;
     border: 1px solid #ccd0d5;
@@ -123,7 +119,7 @@
     width: 240px;
   }
   
-  /* TABLE CARD */
+  /* DATA TABLE */
   .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -133,26 +129,22 @@
     box-shadow: 0 2px 8px var(--shadow);
     margin-top: 16px;
   }
-  
   .data-table th {
     background: var(--primary-start);
     color: #fff;
     padding: 12px;
     text-align: left;
   }
-  
   .data-table th.sortable {
     position: relative;
     padding-right: 24px;
     cursor: pointer;
     user-select: none;
   }
-  
   .data-table th .header-content {
     display: flex;
     align-items: center;
   }
-  
   .data-table .sort-indicator {
     position: absolute;
     right: 8px;
@@ -161,17 +153,15 @@
     font-size: 12px;
     color: #fff;
   }
-  
   .data-table td {
     padding: 12px;
     border-bottom: 1px solid #e0e0e0;
   }
-  
   .data-table tr:hover {
     background: #f0f4f8;
   }
   
-  /* ACTION BUTTONS IN TABLE */
+  /* ACTION BUTTONS IN TABLE ROW */
   .action-buttons {
     display: flex;
     gap: 8px;
@@ -180,10 +170,8 @@
   /* MODAL BACKDROP */
   .popup-backdrop {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
@@ -201,17 +189,16 @@
     box-shadow: 0 2px 12px var(--shadow);
   }
   
+  /* FORM FIELDS */
   .form-field {
     margin-bottom: 16px;
   }
-  
   .form-field label {
     display: block;
     margin-bottom: 6px;
     font-weight: 500;
     font-size: 14px;
   }
-  
   .form-field input {
     width: 100%;
     padding: 8px;
@@ -219,7 +206,6 @@
     border-radius: 4px;
     font-size: 14px;
   }
-  
   .modal-buttons {
     display: flex;
     justify-content: flex-end;
@@ -230,19 +216,16 @@
   /* ADVANCED SEARCH GRID */
   .advanced-search {
     display: grid;
-    grid-template-columns: 160px 120px 200px auto;
+    grid-template-columns: 160px 120px 200px 80px;
     gap: 8px;
     background: var(--card-bg);
-    padding: 16px;
+    padding: 12px;
     border-radius: 8px;
     box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 16px;
   }
   
-  .criteria-row {
-    display: contents;
-  }
-  
+  /* Inputs & selects fill columns */
   .advanced-search select,
   .advanced-search input {
     width: 100%;
@@ -252,16 +235,31 @@
     font-size: 14px;
   }
   
-  .advanced-search button {
-    padding: 6px 8px;
+  /* Action-cell containing remove and, on last row, add */
+  .action-cell {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+    align-items: center;
   }
   
-  /* Place AdvancedSearch buttons right under the Value column */
-  .advanced-search .modal-buttons {
-    grid-column: 3 / 4; /* start under Value column */
-    margin-top: 8px;
-    display: flex;
-    justify-content: flex-start; /* align left in that cell */
-    gap: 8px;
+  /* Compact small buttons */
+  .advanced-search .small {
+    padding: 4px 8px;
+    font-size: 12px;
   }
+  
+  /* Footer buttons placement */
+  /* Search under Field (col 1) */
+  .advanced-search > button.button-primary {
+    grid-column: 1;
+    justify-self: start;
+  }
+  /* Reset under Operator (col 2) */
+  .advanced-search > button.button-secondary {
+    grid-column: 2;
+    justify-self: start;
+  }
+  /* empty placeholders fill cols 3 & 4 */
+  .advanced-search > div { }
   
