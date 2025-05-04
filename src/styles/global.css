@@ -256,11 +256,12 @@
     padding: 6px 8px;
   }
   
+  /* Place AdvancedSearch buttons right under the Value column */
   .advanced-search .modal-buttons {
-    grid-column: 3 / span 2;
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    grid-column: 3 / 4; /* start under Value column */
     margin-top: 8px;
+    display: flex;
+    justify-content: flex-start; /* align left in that cell */
+    gap: 8px;
   }
   
