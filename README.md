@@ -71,9 +71,27 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 1. Incomes screen
 
-5. Adding new bill shold 
+Bills 
+
+deleting a bill should delete all corresponding transactions that are in future 
+updating a bill should update all corresponding transactions that are in future 
+amount in transactions for expense should be in red colour 
+
+Income screen
+
+Adding new income should 
 populate transactions with start date and next 2 years using frequency, if end date is available, populate until end date
 if the transaction record is in the past, update status as Paid, if in future set it as Scheduled
 Transaction date is calculated using frequency
-Direction will be Expense
+Direction will be Income
+amount in transactions for expense should be in green colour 
+
+
+deleting an income should delete all corresponding transactions that are in future 
+updating an income should update all corresponding transactions that are in future 
+
+
+a new table called incomes is created, give incomes screen, similar to bills screen, api is incomes, the category comes from categories where direction is Income
+
+amount in transactions for expense should be in red colour 
 
