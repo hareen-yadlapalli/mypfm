@@ -15,19 +15,19 @@ export default function IncomesScreen() {
   const [catRows, setCatRows]                 = useState([]);
 
   useEffect(() => {
-    fetch('/api/properties')
+    fetch('http://localhost:5000/api/properties')
       .then(r => r.json())
       .then(data => setPropertyOptions([
         { label: 'None', value: 0 },
         ...data.map(p => ({ label: `${p.address}, ${p.suburb}`, value: p.id }))
       ]));
-    fetch('/api/accounts')
+    fetch('http://localhost:5000/api/accounts')
       .then(r => r.json())
       .then(data => setAccountOptions([
         { label: 'None', value: 0 },
         ...data.map(a => ({ label: `${a.provider} – ${a.accountno}`, value: a.id }))
       ]));
-    fetch('/api/categories')
+    fetch('http://localhost:5000/api/categories')
       .then(r => r.json())
       .then(data => setCatRows(data.filter(c => c.direction === 'Income')));
   }, []);

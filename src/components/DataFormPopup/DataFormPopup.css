@@ -1,82 +1,63 @@
-/* src/components/DataFormPopup/DataFormPopup.css */
-
-/* dimmed backdrop behind the modal */
+/* semi‐transparent backdrop, center the .popup */
 .popup-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
-/* the modal itself */
+/* the white card */
 .popup {
-  background: var(--card-bg);
-  border-radius: 8px;
-  padding: 24px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;        /* limit height to 80% of viewport */
-  overflow-y: auto;        /* enable vertical scroll if content overflows */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  position: relative;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  width: 600px;          /* a little wider */
+  max-width: 90vw;
+  max-height: 90vh;      /* scroll if too tall */
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
-/* title at the top */
+/* title styling */
 .popup-title {
   margin: 0 0 16px;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: var(--primary-start);
 }
 
-/* each form field row */
+/* each field */
 .form-field {
   display: flex;
   flex-direction: column;
   margin-bottom: 16px;
 }
 
-/* labels above inputs */
+/* label above inputs/selects */
 .form-field label {
   margin-bottom: 6px;
   font-weight: 500;
 }
 
-/* inputs and selects full width */
+/* text inputs */
 .form-field input,
 .form-field select {
-  width: 100%;
-  padding: 8px 12px;
+  padding: 8px;
   font-size: 14px;
-  border: 1px solid #ccd0d5;
+  border: 1px solid #ccc;
   border-radius: 4px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;           /* fill the popup */
+  box-sizing: border-box;
 }
 
-/* focus styles */
-.form-field input:focus,
-.form-field select:focus {
-  outline: none;
-  border-color: var(--primary-start);
-  box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
-}
-
-/* container for the two buttons */
+/* button row */
 .modal-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 16px;
-}
-
-/* button overrides if needed */
-.modal-buttons .button {
-  min-width: 80px;
+  margin-top: 8px;
 }

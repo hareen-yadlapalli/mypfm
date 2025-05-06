@@ -44,23 +44,23 @@ export default function TransactionsScreen() {
   }, []);
 
   const fields = useMemo(() => [
-    { label: 'Bill ID',           name: 'billid',           type: 'number' },
-    { label: 'Purchase ID',       name: 'purchaseid',       type: 'number' },
-    { label: 'Name',              name: 'name',             type: 'text'   },
+    { label: 'Bill ID',          name: 'billid',           type: 'number' },
+    { label: 'Purchase ID',      name: 'purchaseid',       type: 'number' },
+    { label: 'Name',             name: 'name',             type: 'text'   },
     {
       label: 'Direction',
       name: 'direction',
       type: 'select',
       options: ['Expense','Income']
     },
-    { label: 'Status',            name: 'status',           type: 'text'   },
-    { label: 'Category',          name: 'category',         type: 'text'   },
-    { label: 'Subcat1',           name: 'subcategory1',     type: 'text'   },
-    { label: 'Subcat2',           name: 'subcategory2',     type: 'text'   },
-    { label: 'Subcat3',           name: 'subcategory3',     type: 'text'   },
-    { label: 'Provider',          name: 'provider',         type: 'text'   },
-    { label: 'Amount',            name: 'amount',           type: 'number' },
-    { label: 'Transaction Date',  name: 'transactiondate',  type: 'date'   },
+    { label: 'Status',           name: 'status',           type: 'text'   },
+    { label: 'Category',         name: 'category',         type: 'text'   },
+    { label: 'Subcat1',          name: 'subcategory1',     type: 'text'   },
+    { label: 'Subcat2',          name: 'subcategory2',     type: 'text'   },
+    { label: 'Subcat3',          name: 'subcategory3',     type: 'text'   },
+    { label: 'Provider',         name: 'provider',         type: 'text'   },
+    { label: 'Amount',           name: 'amount',           type: 'number' },
+    { label: 'Transaction Date', name: 'transactiondate',  type: 'date'   },
     {
       label: 'Account',
       name: 'accountid',
@@ -82,7 +82,7 @@ export default function TransactionsScreen() {
       canSort: true,
       Cell: ({ value }) => formatDate(value)
     },
-    { Header: 'Name', accessor: 'name', canSort: true },
+    { Header: 'Name',      accessor: 'name',      canSort: true },
     { Header: 'Direction', accessor: 'direction', canSort: true },
     { Header: 'Status',    accessor: 'status',    canSort: true },
     {
@@ -95,11 +95,11 @@ export default function TransactionsScreen() {
         </span>
       )
     },
-    { Header: 'Category',      accessor: 'category',      canSort: true },
-    { Header: 'Subcat1',       accessor: 'subcategory1' },
-    { Header: 'Subcat2',       accessor: 'subcategory2' },
-    { Header: 'Subcat3',       accessor: 'subcategory3' },
-    { Header: 'Provider',      accessor: 'provider',      canSort: true },
+    { Header: 'Category',  accessor: 'category',  canSort: true },
+    { Header: 'Subcat1',   accessor: 'subcategory1' },
+    { Header: 'Subcat2',   accessor: 'subcategory2' },
+    { Header: 'Subcat3',   accessor: 'subcategory3' },
+    { Header: 'Provider',  accessor: 'provider',  canSort: true },
     {
       Header: 'Account',
       accessor: 'accountLabel',
@@ -109,23 +109,23 @@ export default function TransactionsScreen() {
       Header: 'Property',
       accessor: 'propertyLabel',
       canSort: true
-    },
+    }
   ], []);
 
   const transformFetch = useMemo(() => data => {
-    const today = new Date();
     return data
       .map(item => {
-        const acc = accountOptions.find(o => o.value === (item.accountid ?? 0)) || {};
+        const acc  = accountOptions.find(o => o.value === (item.accountid ?? 0)) || {};
         const prop = propertyOptions.find(o => o.value === (item.propertyid ?? 0)) || {};
         return {
           ...item,
-          accountLabel: acc.label || 'None',
+          accountLabel:  acc.label  || 'None',
           propertyLabel: prop.label || 'None'
         };
       })
-      // sort ascending by date from today
-      .sort((a, b) => new Date(a.transactiondate) - new Date(b.transactiondate));
+      .sort((a, b) =>
+        new Date(a.transactiondate) - new Date(b.transactiondate)
+      );
   }, [accountOptions, propertyOptions]);
 
   return (
@@ -135,6 +135,8 @@ export default function TransactionsScreen() {
       columns={columns}
       idField="id"
       transformFetch={transformFetch}
+      initialSortField="transactiondate"
+      initialSortOrder="asc"
     />
   );
 }

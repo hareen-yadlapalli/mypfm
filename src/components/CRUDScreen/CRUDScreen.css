@@ -1,141 +1,121 @@
-/* --- overall layout --- */
+:root {
+  --bg-color: #f5f6f8;
+  --card-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --primary-start: #2e7d32;
+}
+
+/* Container */
 .main {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 20px;
   background: var(--bg-color);
+  padding: 16px;
 }
 
-/* --- top bar (search/actions) --- */
+/* Top bar */
 .button-container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   background: var(--card-bg);
+  padding: 12px;
   box-shadow: 0 1px 3px var(--shadow);
-  padding: 16px;
-  flex-wrap: wrap;
   gap: 12px;
 }
-.left-buttons {
+
+/* Left grouped controls */
+.left-controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-/* --- export menu dropdown --- */
-.export-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  z-index: 10;
-}
-.export-menu-item {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-.export-menu-item:hover {
-  background: #f0f0f0;
-}
-
-/* --- import label input hack --- */
-.import-btn input {
-  position: absolute;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-
-/* --- columns picker container --- */
-.columns-picker {
+/* Right grouped controls */
+.right-controls {
   position: relative;
 }
 
-/* --- columns menu --- */
+/* Export / Import wrappers */
+.export-menu-wrapper,
+.import-label {
+  position: relative;
+}
+
+/* Export menu */
+.export-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--card-bg);
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 6px var(--shadow);
+  z-index: 20;
+}
+.export-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.export-item:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* Columns picker */
 .column-menu {
   position: absolute;
   top: 100%;
   right: 0;
-  width: 280px;
-  max-height: 300px;
   background: var(--card-bg);
   border: 1px solid #ddd;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 2px 6px var(--shadow);
+  padding: 8px;
+  max-height: 300px;
+  overflow-y: auto;
   z-index: 20;
 }
-
-.column-menu-header,
-.column-menu-footer {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px;
-  gap: 8px;
-}
-
-.column-menu-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px;
-}
-
-.column-menu-list label {
+.column-menu label {
   display: flex;
   align-items: center;
+  gap: 6px;
   margin-bottom: 4px;
   font-size: 14px;
 }
-
-.column-menu-list input {
-  margin-right: 6px;
+.column-menu hr {
+  margin: 8px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+.column-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-/* --- pagination --- */
+/* Pagination */
 .pagination {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+.page-size {
+  width: 60px;
+}
 
-/* --- table container --- */
-.table-container {
+/* Table wrapper */
+.table-wrapper {
   flex: 1;
-  overflow-y: auto;
+  overflow: auto;
   background: var(--card-bg);
-  padding: 16px;
-  box-shadow: 0 1px 3px var(--shadow);
+  padding: 12px;
+  margin-top: 12px;
 }
 
-/* --- responsive tweaks --- */
+/* Responsive */
 @media (max-width: 768px) {
-  .button-container {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .pagination {
-    justify-content: center;
-    margin-top: 12px;
-  }
-}
-
-/* Make sure the Import label is the positioning context */
-.import-btn {
-  position: relative;
-  display: inline-block;
-}
-
-/* Now this file-input will only cover its own button, not the entire screen */
-.import-btn input[type="file"] {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
+  .button-container { flex-direction: column; }
+  .left-controls { flex-wrap: wrap; justify-content: center; }
+  .pagination { justify-content: center; margin-top: 12px; }
 }

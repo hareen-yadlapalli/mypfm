@@ -1,5 +1,3 @@
-// src/components/DataFormPopup/DataFormPopup.jsx
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import './DataFormPopup.css';
@@ -25,7 +23,6 @@ const DataFormPopup = ({
         <h3 className="popup-title">{title}</h3>
 
         {fields.map(field => {
-          // allow options to be either static array or a function(formData)->array
           const opts =
             field.type === 'select'
               ? (typeof field.options === 'function'
