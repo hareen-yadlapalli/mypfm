@@ -1,3 +1,5 @@
+// src/screens/TransactionsScreen/TransactionsScreen.jsx
+
 import React, { useState, useEffect, useMemo } from 'react';
 import CRUDScreen from '../../components/CRUDScreen/CRUDScreen';
 
@@ -13,6 +15,7 @@ const formatDate = iso => {
 export default function TransactionsScreen() {
   const [propertyOptions, setPropertyOptions] = useState([{ label: 'None', value: 0 }]);
   const [accountOptions, setAccountOptions]   = useState([{ label: 'None', value: 0 }]);
+  const [totals, setTotals] = useState({ income: 0, expense: 0, net: 0 });
 
   // fetch Properties
   useEffect(() => {
@@ -98,15 +101,8 @@ export default function TransactionsScreen() {
     { Header: 'Category',  accessor: 'category',  canSort: true },
     { Header: 'Subcat1',   accessor: 'subcategory1' },
     { Header: 'Subcat2',   accessor: 'subcategory2' },
-   // { Header: 'Subcat3',   accessor: 'subcategory3' },
+    // { Header: 'Subcat3',   accessor: 'subcategory3' }, // hidden by choice
     { Header: 'Provider',  accessor: 'provider',  canSort: true },
-    /*
-    {
-      Header: 'Account',
-      accessor: 'accountLabel',
-      canSort: true
-    },
-    */
     {
       Header: 'Property',
       accessor: 'propertyLabel',
@@ -114,8 +110,10 @@ export default function TransactionsScreen() {
     }
   ], []);
 
+  // transformFetch both decorates each row *and* calculates
+  // totals over the full dataset
   const transformFetch = useMemo(() => data => {
-    return data
+    const arr = data
       .map(item => {
         const acc  = accountOptions.find(o => o.value === (item.accountid ?? 0)) || {};
         const prop = propertyOptions.find(o => o.value === (item.propertyid ?? 0)) || {};
@@ -128,17 +126,45 @@ export default function TransactionsScreen() {
       .sort((a, b) =>
         new Date(a.transactiondate) - new Date(b.transactiondate)
       );
+
+    // compute totals over *all* fetched records
+    let income = 0, expense = 0;
+    arr.forEach(txn => {
+      if (txn.direction === 'Income')  income  += Number(txn.amount);
+      if (txn.direction === 'Expense') expense += Number(txn.amount);
+    });
+    setTotals({
+      income:  income,
+      expense: expense,
+      net:      income - expense
+    });
+
+    return arr;
   }, [accountOptions, propertyOptions]);
 
   return (
-    <CRUDScreen
-      endpoint="http://localhost:5000/api/transactions"
-      fields={fields}
-      columns={columns}
-      idField="id"
-      transformFetch={transformFetch}
-      initialSortField="transactiondate"
-      initialSortOrder="asc"
-    />
+    <div style={{ padding: '20px' }}>
+      {/* Totals bar */}
+      <div style={{
+        display: 'flex',
+        gap: '24px',
+        marginBottom: '16px',
+        fontWeight: 'bold'
+      }}>
+        <div>Total Income:  ${totals.income.toFixed(2)}</div>
+        <div>Total Expense: ${totals.expense.toFixed(2)}</div>
+        <div>Net:            ${totals.net.toFixed(2)}</div>
+      </div>
+
+      <CRUDScreen
+        endpoint="http://localhost:5000/api/transactions"
+        fields={fields}
+        columns={columns}
+        idField="id"
+        transformFetch={transformFetch}
+        initialSortField="transactiondate"
+        initialSortOrder="asc"
+      />
+    </div>
   );
 }
