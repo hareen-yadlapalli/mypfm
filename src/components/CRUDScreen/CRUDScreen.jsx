@@ -127,6 +127,7 @@ const CRUDScreen = ({
   // Save (create/update)
   const handleSave = () => {
     const payload = mode==='add' ? formData : editingItem;
+    console.log('⏳ Saving payload to', endpoint, ':', payload);
     const url = mode==='add' ? endpoint : `${endpoint}/${editingItem[idField]}`;
     const method = mode==='add' ? 'POST' : 'PUT';
     fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
@@ -212,9 +213,26 @@ const CRUDScreen = ({
           <button className="button button-secondary" onClick={()=>setShowAdvanced(v=>!v)}>
             {showAdvanced?'Hide Advanced':'Advanced Search'}
           </button>
-          <ActionButton label="Add New" onClick={()=>{
-            setMode('add'); setFormData(fields.reduce((a,f)=>(a[f.name]='',a),{})); setShowPopup(true);
-          }} />
+          <ActionButton
+   label="Add New"
+   onClick={() => {
+     setMode('add');
+     // Build initial formData:
+     const init = {};
+     fields.forEach(f => {
+       if (f.type === 'select') {
+         // options can be either strings or {label,value} objects
+         const firstOpt = Array.isArray(f.options) && f.options[0];
+         init[f.name] = typeof firstOpt === 'object'
+           ? firstOpt.value         // e.g. { label, value }
+           : firstOpt || '';       // e.g. 'Expense'
+       } else {
+         init[f.name] = '';        // text/number/date stay blank
+       }
+     });
+     setFormData(init);
+     setShowPopup(true);
+   }} />
           <div style={{position:'relative'}}>
             <ActionButton label="Export" onClick={()=>setShowExportMenu(v=>!v)} />
             {showExportMenu&&(

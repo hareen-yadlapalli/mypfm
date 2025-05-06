@@ -6,6 +6,9 @@ import CRUDScreen from '../../components/CRUDScreen/CRUDScreen';
 const fields = [
   { label: 'Bill ID',            name: 'billid',          type: 'number' },
   { label: 'Purchase ID',        name: 'purchaseid',      type: 'number' },
+  { label: 'Name',               name: 'name',      type: 'number' },
+  { label: 'Status',             name: 'status',      type: 'number' },
+
   { label: 'Category',           name: 'category',        type: 'text'   },
   { label: 'Subcategory 1',      name: 'subcategory1',    type: 'text'   },
   { label: 'Subcategory 2',      name: 'subcategory2',    type: 'text'   },
