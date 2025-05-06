@@ -23,35 +23,37 @@ const DataFormPopup = ({
     <div className="popup-backdrop">
       <div className="popup">
         <h3 className="popup-title">{title}</h3>
-        {fields.map(field => (
-          <div className="form-field" key={field.name}>
-            <label htmlFor={field.name}>{field.label}</label>
-            {field.type === 'select' ? (
-              <select
-                id={field.name}
-                value={formData[field.name] ?? ''}
-                onChange={e => handleChange(field.name, e.target.value)}
-              >
-                <option value="" disabled>
-                  -- Select {field.label} --
-                </option>
-                {field.options.map(opt => (
-                  <option key={opt} value={opt}>
-                    {opt}
+        <div className="form-fields-container">
+          {fields.map(field => (
+            <div className="form-field" key={field.name}>
+              <label htmlFor={field.name}>{field.label}</label>
+              {field.type === 'select' ? (
+                <select
+                  id={field.name}
+                  value={formData[field.name] ?? ''}
+                  onChange={e => handleChange(field.name, e.target.value)}
+                >
+                  <option value="" disabled>
+                    -- Select {field.label} --
                   </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                id={field.name}
-                type={field.type}
-                placeholder={field.placeholder || ''}
-                value={formData[field.name] ?? ''}
-                onChange={e => handleChange(field.name, e.target.value)}
-              />
-            )}
-          </div>
-        ))}
+                  {field.options.map(opt => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id={field.name}
+                  type={field.type}
+                  placeholder={field.placeholder || ''}
+                  value={formData[field.name] ?? ''}
+                  onChange={e => handleChange(field.name, e.target.value)}
+                />
+              )}
+            </div>
+          ))}
+        </div>
         <div className="modal-buttons">
           <button className="button button-secondary" onClick={onCancel}>
             Cancel
