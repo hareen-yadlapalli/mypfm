@@ -31,14 +31,11 @@ const DataFormPopup = ({
                 <select
                   id={field.name}
                   value={formData[field.name] ?? ''}
-                  onChange={e => handleChange(field.name, e.target.value)}
+                  onChange={e => handleChange(field.name, field.options[0] && field.options[0].value !== undefined ? Number(e.target.value) : e.target.value)}
                 >
-                  <option value="" disabled>
-                    -- Select {field.label} --
-                  </option>
                   {field.options.map(opt => (
-                    <option key={opt} value={opt}>
-                      {opt}
+                    <option key={opt.value ?? opt} value={opt.value ?? opt}>
+                      {opt.label ?? opt}
                     </option>
                   ))}
                 </select>
