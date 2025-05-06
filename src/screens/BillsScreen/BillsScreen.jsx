@@ -69,7 +69,7 @@ export default function BillsScreen() {
       },
       { label: 'Provider',    name: 'provider',    type: 'text' },
       { label: 'Frequency', name: 'frequency', type: 'select',
-        options: ['Weekly','Fortnightly','Monthly','Yearly'] },
+        options: ['Weekly','Fortnightly','Monthly','Quarterly','Yearly'] },
       { label: 'Amount',    name: 'amount',    type: 'number' },
       { label: 'Start Date',name: 'startdate', type: 'date' },
       { label: 'End Date',  name: 'enddate',   type: 'date' },
