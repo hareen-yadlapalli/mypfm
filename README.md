@@ -69,9 +69,21 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-search button to be below column dropdown, reset button to be below condition column, add condition button should not be that big, same as previoius size, delete button is also same, after input, delete button, then add condition, add condition only on last search row
-
-Advanced search option after search box, and then add members box
-advanced search section to appear only on advanced search box
-when advanced search is displayed, that button to appear as hide advanced search and when clicked hide advanced search
-gap between search and advanced search
+1. Incomes screen
+2. Direction column in Categories column
+3. Direction UI - drop down in Categories screen
+4. Add status, type column in Transactions table
+4. Transactions to have status (Scheduled, Paid, Due)
+5. Type to either Income or Expense
+4. Bills
+    Add new
+        Show property instead of property id - drop down similar to in Accounts screen
+        Show account instead of account id - drop down to have account Provider+"- "+Account No
+        Show Category, Subcategory... in cascading drop down where direction is Expense in the category table - show values from Categories tables
+        Frequency drop down - Weekly, Fortnightly, Monthly, Yearly
+    Screen that shows full data
+        Property - show address, None if no address
+        Account - Acount provider + " - " + Account number
+        Category.. as given in Add New
+        Frequency - as given in Add New
+5. Populating bills to populate transactions with start date and next 2 years if no end date

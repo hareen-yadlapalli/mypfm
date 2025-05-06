@@ -4,6 +4,7 @@ import React from 'react';
 import CRUDScreen from '../../components/CRUDScreen/CRUDScreen';
 
 const fieldsCat = [
+  { label: 'Direction',   name: 'direction', type: 'select', options: ['Expense', 'Income'] },
   { label: 'Category',    name: 'category',    type: 'text' },
   { label: 'Subcat1',     name: 'subcategory1',type: 'text' },
   { label: 'Subcat2',     name: 'subcategory2',type: 'text' },
