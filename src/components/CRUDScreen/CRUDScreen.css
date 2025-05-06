@@ -65,3 +65,25 @@
     }
   }
   
+  /* Column-picker dropdown */
+.column-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  padding: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 20;
+}
+.column-menu label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.column-menu input {
+  margin-right: 6px;
+}

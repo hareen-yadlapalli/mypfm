@@ -16,49 +16,60 @@ import './CRUDScreen.css';
 const CRUDScreen = ({
   endpoint,
   fields,
-  columns = [], 
+  columns = [],      // default visible columns
   idField = 'id',
-  transformFetch = data => data,
+  transformFetch = d => d,
 }) => {
-  // Data and UI state
-  const [items, setItems] = useState([]);
+  // fetch & UI state
+  const [items, setItems]           = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [criteria, setCriteria] = useState([]);
+  const [criteria, setCriteria]     = useState([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData]     = useState({});
   const [editingItem, setEditingItem] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
-  const [mode, setMode] = useState('add');
-  const [sortField, setSortField] = useState(idField);
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [showPopup, setShowPopup]   = useState(false);
+  const [mode, setMode]             = useState('add');
+  const [sortField, setSortField]   = useState(idField);
+  const [sortOrder, setSortOrder]   = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-
-  // Export/import menu
+  const [pageSize, setPageSize]     = useState(10);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showColsMenu, setShowColsMenu]     = useState(false);
+
   const fileInputRef = useRef();
+  const colsRef      = useRef();
+  const location     = useLocation();
 
-  // Sidebar active state
-  const location = useLocation();
+  // build ALL possible columns (from props.columns or fields)
+  const allCols = useMemo(() => {
+    const base = columns.length
+      ? columns
+      : fields.map(f => ({ Header: f.label, accessor: f.name, canSort: true }));
+    return base;
+  }, [columns, fields]);
 
-  // Fetch initial data
+  // which are currently visible?
+  const [visibleCols, setVisibleCols] = useState(
+    () => allCols.map(c => c.accessor)
+  );
+
+  // fetch data once
   useEffect(() => {
     fetch(endpoint)
-      .then(res => res.json())
+      .then(r => r.json())
       .then(data => setItems(transformFetch(data)))
       .catch(console.error);
   }, [endpoint, transformFetch]);
 
-  // Simple search filter
+  // simple & advanced filters
   const simpleFiltered = useMemo(() => {
     if (!searchTerm) return items;
-    const lower = searchTerm.toLowerCase();
-    return items.filter(item =>
-      Object.values(item).some(v => String(v || '').toLowerCase().includes(lower))
+    const l = searchTerm.toLowerCase();
+    return items.filter(i =>
+      Object.values(i).some(v => String(v||'').toLowerCase().includes(l))
     );
   }, [items, searchTerm]);
 
-  // Advanced filter
   const filtered = useMemo(() => {
     if (!criteria.length) return simpleFiltered;
     return simpleFiltered.filter(item =>
@@ -69,94 +80,107 @@ const CRUDScreen = ({
         if (def?.type === 'date') {
           const rd = new Date(rec).setHours(0,0,0,0);
           const qd = new Date(value).setHours(0,0,0,0);
-          if (operator === 'on') return rd === qd;
-          if (operator === 'before') return rd < qd;
-          return rd > qd;
+          if (operator==='on')     return rd===qd;
+          if (operator==='before') return rd<qd;
+          return rd>qd;
         } else {
-          const lr = String(rec || '').toLowerCase();
+          const lr = String(rec||'').toLowerCase();
           const lq = value.toLowerCase();
-          if (operator === 'contains') return lr.includes(lq);
-          if (operator === 'equals') return lr === lq;
-          if (operator === 'startsWith') return lr.startsWith(lq);
-          if (operator === 'endsWith') return lr.endsWith(lq);
+          switch(operator){
+            case 'contains':   return lr.includes(lq);
+            case 'equals':     return lr===lq;
+            case 'startsWith': return lr.startsWith(lq);
+            case 'endsWith':   return lr.endsWith(lq);
+            default:           return true;
+          }
         }
-        return true;
       })
     );
   }, [simpleFiltered, criteria, fields]);
 
-  // Global sorting
+  // sorting
   const sortedData = useMemo(() => {
     const arr = [...filtered];
     arr.sort((a,b) => {
-      const def = fields.find(f => f.name === sortField);
-      let aVal = a[sortField] ?? '';
-      let bVal = b[sortField] ?? '';
-      if (def?.type === 'date') {
-        aVal = new Date(aVal).getTime();
-        bVal = new Date(bVal).getTime();
+      const def = fields.find(f => f.name===sortField);
+      let av = a[sortField] ?? '';
+      let bv = b[sortField] ?? '';
+      if (def?.type==='date') {
+        av = new Date(av).getTime();
+        bv = new Date(bv).getTime();
       }
-      if (!isNaN(aVal) && !isNaN(bVal)) {
-        return sortOrder==='asc' ? aVal-bVal : bVal-aVal;
+      if (!isNaN(av) && !isNaN(bv)) {
+        return sortOrder==='asc'? av-bv : bv-av;
       }
       return sortOrder==='asc'
-        ? String(aVal).localeCompare(String(bVal))
-        : String(bVal).localeCompare(String(aVal));
+        ? String(av).localeCompare(String(bv))
+        : String(bv).localeCompare(String(av));
     });
     return arr;
   }, [filtered, sortField, sortOrder, fields]);
 
-  // Pagination
+  // pagination
   const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
   const pageNumbers = [];
   const startPage = Math.max(1, currentPage - 4);
-  const endPage = Math.min(totalPages, startPage + 9);
-  for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
+  const endPage   = Math.min(totalPages, startPage + 9);
+  for (let i=startPage; i<=endPage; i++) pageNumbers.push(i);
+
   const pagedData = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return sortedData.slice(start, start + pageSize);
   }, [sortedData, currentPage, pageSize]);
 
-  // Sort handler
+  // handlers: sort, save, delete
   const handleSort = field => {
-    if (sortField === field) setSortOrder(o => o==='asc'?'desc':'asc');
+    if (sortField===field) setSortOrder(o=> o==='asc'?'desc':'asc');
     else { setSortField(field); setSortOrder('asc'); }
     setCurrentPage(1);
   };
 
-  // Save (create/update)
   const handleSave = () => {
     const payload = mode==='add' ? formData : editingItem;
-    console.log('⏳ Saving payload to', endpoint, ':', payload);
-    const url = mode==='add' ? endpoint : `${endpoint}/${editingItem[idField]}`;
-    const method = mode==='add' ? 'POST' : 'PUT';
-    fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(res => res.ok ? res.json() : Promise.reject())
+    const url     = mode==='add' ? endpoint : `${endpoint}/${editingItem[idField]}`;
+    const method  = mode==='add' ? 'POST' : 'PUT';
+    fetch(url, {
+      method,
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
         setItems(list => {
           const updated = mode==='add'
             ? [...list, data]
-            : list.map(i=>i[idField]===data[idField]?data:i);
-          // re-sort
+            : list.map(i => i[idField]===data[idField] ? data : i);
+          // re-apply sort
           return [...updated].sort((x,y)=>{
             const df = fields.find(f=>f.name===sortField);
-            let xv = x[sortField]??'', yv=y[sortField]??'';
-            if(df?.type==='date'){ xv=new Date(xv).getTime(); yv=new Date(yv).getTime(); }
-            if(!isNaN(xv)&&!isNaN(yv)) return sortOrder==='asc'?xv-yv:yv-xv;
+            let xv = x[sortField] ?? '', yv = y[sortField] ?? '';
+            if (df?.type==='date') {
+              xv = new Date(xv).getTime();
+              yv = new Date(yv).getTime();
+            }
+            if (!isNaN(xv) && !isNaN(yv)) {
+              return sortOrder==='asc'? xv-yv : yv-xv;
+            }
             return sortOrder==='asc'
               ? String(xv).localeCompare(String(yv))
               : String(yv).localeCompare(String(xv));
           });
         });
         setShowPopup(false);
-      }).catch(()=>alert('Failed to save.'));
+      })
+      .catch(()=>alert('Failed to save.'));
   };
 
-  // Delete handler
   const handleDelete = id => {
-    if(!window.confirm('Delete this record?')) return;
-    fetch(`${endpoint}/${id}`,{method:'DELETE'})
-      .then(res=>res.ok?setItems(list=>list.filter(i=>i[idField]!==id)):Promise.reject())
+    if (!window.confirm('Delete this record?')) return;
+    fetch(`${endpoint}/${id}`, { method:'DELETE' })
+      .then(r => r.ok
+        ? setItems(list => list.filter(i => i[idField]!==id))
+        : Promise.reject()
+      )
       .catch(()=>alert('Failed to delete.'));
   };
 
@@ -250,6 +274,29 @@ const CRUDScreen = ({
           </label>
           <ActionButton label="Template" onClick={handleDownloadTemplate} />
         </div>
+        <div ref={colsRef} style={{ position:'relative' }}>
+            <ActionButton label="Columns" onClick={()=>setShowColsMenu(v=>!v)} />
+            {showColsMenu && (
+              <div className="column-menu">
+                {allCols.map(c => (
+                  <label key={c.accessor}>
+                    <input
+                      type="checkbox"
+                      checked={visibleCols.includes(c.accessor)}
+                      onChange={() => {
+                        setVisibleCols(vc =>
+                          vc.includes(c.accessor)
+                            ? vc.filter(x=>x!==c.accessor)
+                            : [...vc, c.accessor]
+                        );
+                      }}
+                    />
+                    {c.Header}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
         <div className="pagination" style={{display:'flex',alignItems:'center',gap:'8px'}}>
           <button className="button" onClick={()=>setCurrentPage(p=>Math.max(p-1,1))} disabled={currentPage===1}>Back</button>
           {pageNumbers.map(n=>(
