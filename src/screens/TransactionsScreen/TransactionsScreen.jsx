@@ -7,6 +7,8 @@ const fields = [
   { label: 'Bill ID',            name: 'billid',          type: 'number' },
   { label: 'Purchase ID',        name: 'purchaseid',      type: 'number' },
   { label: 'Name',               name: 'name',      type: 'number' },
+  { label: 'Direction',               name: 'direction',      type: 'number' },
+
   { label: 'Status',             name: 'status',      type: 'number' },
 
   { label: 'Category',           name: 'category',        type: 'text'   },
