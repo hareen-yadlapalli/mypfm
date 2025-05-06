@@ -98,13 +98,15 @@ export default function TransactionsScreen() {
     { Header: 'Category',  accessor: 'category',  canSort: true },
     { Header: 'Subcat1',   accessor: 'subcategory1' },
     { Header: 'Subcat2',   accessor: 'subcategory2' },
-    { Header: 'Subcat3',   accessor: 'subcategory3' },
+   // { Header: 'Subcat3',   accessor: 'subcategory3' },
     { Header: 'Provider',  accessor: 'provider',  canSort: true },
+    /*
     {
       Header: 'Account',
       accessor: 'accountLabel',
       canSort: true
     },
+    */
     {
       Header: 'Property',
       accessor: 'propertyLabel',

@@ -78,12 +78,12 @@ export default function BillsScreen() {
 
   const columns = useMemo(() => [
     { Header: 'Property', accessor: 'propertyLabel', canSort: true },
-    { Header: 'Account',  accessor: 'accountLabel',  canSort: true },
+   // { Header: 'Account',  accessor: 'accountLabel',  canSort: true },
     { Header: 'Name',     accessor: 'name',          canSort: true },
     { Header: 'Category', accessor: 'category',      canSort: true },
     { Header: 'Subcat1',  accessor: 'subcategory1' },
-    { Header: 'Subcat2',  accessor: 'subcategory2' },
-    { Header: 'Subcat3',  accessor: 'subcategory3' },
+   // { Header: 'Subcat2',  accessor: 'subcategory2' },
+   // { Header: 'Subcat3',  accessor: 'subcategory3' },
     { Header: 'Provider',    accessor: 'provider'},
 
     { Header: 'Frequency',accessor: 'frequency' },
@@ -99,12 +99,14 @@ export default function BillsScreen() {
       canSort: true,
       Cell: ({ value }) => formatDate(value)
     },
+    /*
     {
       Header: 'End',
       accessor: 'enddate',
       canSort: true,
       Cell: ({ value }) => formatDate(value)
     },
+    */
   ], []);
 
   const transformFetch = useMemo(() => data => data.map(item => {
