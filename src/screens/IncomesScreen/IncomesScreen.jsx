@@ -77,6 +77,7 @@ export default function IncomesScreen() {
             .map(r => r.subcategory3)
         )).filter(v=>v).map(v=>({label:v,value:v}))
       },
+      { label: 'Provider',    name: 'provider',    type: 'text' },
       { label: 'Frequency', name: 'frequency', type: 'select',
         options: ['Weekly','Fortnightly','Monthly','Yearly'] },
       { label: 'Amount',    name: 'amount',    type: 'number' },
@@ -93,6 +94,7 @@ export default function IncomesScreen() {
     { Header: 'Subcat1',    accessor: 'subcategory1' },
     { Header: 'Subcat2',    accessor: 'subcategory2' },
     { Header: 'Subcat3',    accessor: 'subcategory3' },
+    { Header: 'Provider',    accessor: 'provider'},
     { Header: 'Frequency',  accessor: 'frequency' },
     {
       Header: 'Amount',

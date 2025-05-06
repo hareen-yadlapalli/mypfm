@@ -69,37 +69,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-1. Incomes screen
 
-Bills 
+when editing an income / bill, the corresponding transactions from that start date to be updated, if the existing transaction dates don't match with the new transaction dates, then delete existing ones and add new
 
-deleting a bill should delete all corresponding transactions that are in future 
-updating a bill should update all corresponding transactions that are in future 
+transactions is not ascending
+Distance between edit and delete button
 
-Income 
-
-Adding new income should 
-populate transactions with start date and next 2 years using frequency, if end date is available, populate until end date
-if the transaction record is in the past, update status as Paid, if in future set it as Scheduled
-Transaction date is calculated using frequency
-Direction will be Income
-
-deleting an income should delete all corresponding transactions that are in future 
-updating an income should update all corresponding transactions that are in future 
-
-Transactions screen
-amount to have $
-amount in transactions for expense should be in red colour 
-amount in transactions for expense should be in green colour 
-To be sorted based on Transaction date from the current day ascending
-
-Bills and Incomes screen
-amount to have $
-
-
-Dates in income, expense, transactions (in the screen table) should be in the format DD-MMM-YYYY
-
-a new table called incomes is created, give incomes screen, similar to bills screen, api is incomes, the category comes from categories where direction is Income
-
-amount in transactions for expense should be in red colour 
-
+optimisation of code, like getting all data at the beginning and cache, get when updated
