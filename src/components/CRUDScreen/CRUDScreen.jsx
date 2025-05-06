@@ -97,6 +97,17 @@ const CRUDScreen = ({
       .catch(console.error);
   }, [endpoint, transformFetch]);
 
+// build the *full* list of possible columns (either props.columns, or one-per-field)
+  const allCols = useMemo(() => {
+    return columns.length
+      ? columns
+      : fields.map(f => ({
+          Header:   f.label,
+          accessor: f.name,
+          canSort:  true
+        }));
+  }, [columns, fields]);
+
   // Simple filter
   const simpleFiltered = useMemo(() => {
     if (!searchTerm) return items;
@@ -459,7 +470,7 @@ const CRUDScreen = ({
 
       <div className="table-container">
         <DataTable
-          columns={possibleCols.filter(c=>visibleCols.includes(c.accessor))}
+          columns={allCols.filter(c => visibleCols.includes(c.accessor))}
           data={pagedData}
           sortField={sortField}
           sortOrder={sortOrder}
