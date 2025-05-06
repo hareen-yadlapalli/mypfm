@@ -90,6 +90,7 @@ amount in transactions for expense should be in green colour
 deleting an income should delete all corresponding transactions that are in future 
 updating an income should update all corresponding transactions that are in future 
 
+Dates in income and expense (in the screen table) should be in the format DD-MMM-YYYY
 
 a new table called incomes is created, give incomes screen, similar to bills screen, api is incomes, the category comes from categories where direction is Income
 
