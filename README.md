@@ -97,7 +97,7 @@ Bills and Incomes screen
 amount to have $
 
 
-Dates in income and expense (in the screen table) should be in the format DD-MMM-YYYY
+Dates in income, expense, transactions (in the screen table) should be in the format DD-MMM-YYYY
 
 a new table called incomes is created, give incomes screen, similar to bills screen, api is incomes, the category comes from categories where direction is Income
 

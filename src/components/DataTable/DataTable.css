@@ -1,0 +1,37 @@
+/* src/components/DataTable/DataTable.css */
+
+/* Base table styling */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  
+  /* Header and cell padding + borders */
+  .data-table th,
+  .data-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  /* Sticky header so column titles stay visible on scroll */
+  .data-table th {
+    background: var(--primary-start);
+    position: sticky;
+    top: 0;
+    padding: 12px;
+    z-index: 2;
+    text-align: left;
+    font-weight: 700;
+  }
+  
+  /* Hover state for rows */
+  .data-table tbody tr:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+  
+  /* Ensure overflow scroll on the container if needed (wrapper handles it, but just in case) */
+  .data-table-wrapper {
+    overflow-x: auto;
+  }
+  
