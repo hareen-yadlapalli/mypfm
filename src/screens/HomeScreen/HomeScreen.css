@@ -1,0 +1,103 @@
+/* src/screens/HomeScreen/HomeScreen.css */
+
+.home {
+    padding: 24px;
+    font-family: sans-serif;
+  }
+  h2 {
+    margin-bottom: 16px;
+  }
+  
+  /* filter grid */
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .filter-group label {
+    font-size: 0.85em;
+    margin-bottom: 4px;
+    color: #333;
+  }
+  .filter-group select,
+  .filter-group .react-datepicker-wrapper {
+    width: 100%;
+  }
+  
+  /* notice */
+  .notice {
+    color: #666;
+    text-align: center;
+    margin: 16px 0;
+  }
+  
+  /* totals */
+  .totals {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .card {
+    flex: 1;
+    min-width: 140px;
+    background: #fafafa;
+    padding: 12px;
+    border-radius: 6px;
+    text-align: center;
+  }
+  .card h3 {
+    margin: 0;
+    font-size: 1em;
+  }
+  .card p {
+    margin: 8px 0 0;
+    font-size: 1.4em;
+  }
+  .card.income h3 { color: #4caf50 }
+  .card.expense h3 { color: #f44336 }
+  .card.net.positive h3 { color: #4caf50 }
+  .card.net.negative h3 { color: #f44336 }
+  
+  /* charts */
+  .charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  .chart {
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+  }
+  .chart h4 {
+    margin-top: 0;
+    font-size: 0.95em;
+    text-align: center;
+  }
+  
+  /* transaction table */
+  .table-section {
+    overflow-x: auto;
+  }
+  .txn-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .txn-table th,
+  .txn-table td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+  .txn-table thead {
+    background: #f0f0f0;
+  }
+  

@@ -1,8 +1,7 @@
-/* semi‐transparent backdrop, center the .popup */
+/* Full‐screen backdrop */
 .popup-backdrop {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
@@ -10,54 +9,76 @@
   z-index: 1000;
 }
 
-/* the white card */
+/* The white modal card */
 .popup {
   background: #fff;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  width: 600px;          /* a little wider */
-  max-width: 90vw;
-  max-height: 90vh;      /* scroll if too tall */
-  overflow-y: auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  width: 600px;
+  max-width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
-/* title styling */
+/* Header */
 .popup-title {
-  margin: 0 0 16px;
-  font-size: 1.25rem;
+  margin: 16px 24px 0;
+  font-size: 1.3rem;
   font-weight: 600;
+  text-align: center;
 }
 
-/* each field */
+/* Scrollable body for many fields */
+.popup-body {
+  padding: 16px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Each row: label + input/select side by side */
 .form-field {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
   margin-bottom: 16px;
 }
 
-/* label above inputs/selects */
+/* Label fixed width, right‐aligned */
 .form-field label {
-  margin-bottom: 6px;
+  flex: 0 0 140px;
+  margin-right: 12px;
   font-weight: 500;
+  text-align: right;
 }
 
-/* text inputs */
+/* Inputs/selects grow to fill */
 .form-field input,
 .form-field select {
-  padding: 8px;
-  font-size: 14px;
+  flex: 1 1 220px;
+  padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 100%;           /* fill the popup */
+  font-size: 14px;
   box-sizing: border-box;
+  background: #fff;
+  min-width: 0; /* prevents overflow */
 }
 
-/* button row */
+/* Button row */
 .modal-buttons {
+  padding: 12px 24px;
+  border-top: 1px solid #eee;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 8px;
+}
+
+/* Basic button styling */
+.button {
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
 }

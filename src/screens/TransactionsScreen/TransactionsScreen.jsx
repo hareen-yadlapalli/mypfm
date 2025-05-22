@@ -14,25 +14,24 @@ const formatDate = iso => {
 
 export default function TransactionsScreen() {
   const [propertyOptions, setPropertyOptions] = useState([{ label: 'None', value: 0 }]);
-  const [accountOptions, setAccountOptions]   = useState([{ label: 'None', value: 0 }]);
-  const [totals, setTotals] = useState({ income: 0, expense: 0, net: 0 });
+  const [accountOptions,  setAccountOptions]  = useState([{ label: 'None', value: 0 }]);
+  const [catRows,         setCatRows]         = useState([]);
+  const [bills,           setBills]           = useState([]);
+  const [incomes,         setIncomes]         = useState([]);
+  const [totals,          setTotals]          = useState({ income: 0, expense: 0, net: 0 });
 
-  // fetch Properties
+  // ─── fetch lookups ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    fetch('http://localhost:5000/api/properties')
+    fetch('/api/properties')
       .then(r => r.json())
       .then(data =>
         setPropertyOptions([
           { label: 'None', value: 0 },
           ...data.map(p => ({ label: p.address, value: p.id }))
         ])
-      )
-      .catch(console.error);
-  }, []);
+      );
 
-  // fetch Accounts
-  useEffect(() => {
-    fetch('http://localhost:5000/api/accounts')
+    fetch('/api/accounts')
       .then(r => r.json())
       .then(data =>
         setAccountOptions([
@@ -42,28 +41,139 @@ export default function TransactionsScreen() {
             value: a.id
           }))
         ])
-      )
-      .catch(console.error);
+      );
+
+    fetch('/api/categories')
+      .then(r => r.json())
+      .then(setCatRows);
+
+    fetch('/api/bills')
+      .then(r => r.json())
+      .then(setBills);
+
+    fetch('/api/incomes')
+      .then(r => r.json())
+      .then(setIncomes);
   }, []);
 
+  // ─── build the form fields ────────────────────────────────────────────────────
   const fields = useMemo(() => [
-    { label: 'Bill ID',          name: 'billid',           type: 'number' },
-    { label: 'Purchase ID',      name: 'purchaseid',       type: 'number' },
-    { label: 'Name',             name: 'name',             type: 'text'   },
     {
       label: 'Direction',
       name: 'direction',
       type: 'select',
       options: ['Expense','Income']
     },
-    { label: 'Status',           name: 'status',           type: 'text'   },
-    { label: 'Category',         name: 'category',         type: 'text'   },
-    { label: 'Subcat1',          name: 'subcategory1',     type: 'text'   },
-    { label: 'Subcat2',          name: 'subcategory2',     type: 'text'   },
-    { label: 'Subcat3',          name: 'subcategory3',     type: 'text'   },
-    { label: 'Provider',         name: 'provider',         type: 'text'   },
-    { label: 'Amount',           name: 'amount',           type: 'number' },
-    { label: 'Transaction Date', name: 'transactiondate',  type: 'date'   },
+    {
+      label: 'Reference',
+      name: 'billid',  // always stored as billid
+      type: 'select',
+      options: fd => {
+        const source = fd.direction === 'Expense' ? bills : fd.direction === 'Income' ? incomes : [];
+        return source.map(x => {
+          // collect name + category + any subcategories
+          const parts = [ x.name ];
+          if (x.category)      parts.push(x.category);
+          if (x.subcategory1)  parts.push(x.subcategory1);
+          if (x.subcategory2)  parts.push(x.subcategory2);
+          if (x.subcategory3)  parts.push(x.subcategory3);
+          return {
+            label: parts.join(' - '),
+            value: x.id
+          };
+        });
+      }
+    },
+    { label: 'Purchase ID',      name: 'purchaseid',   type: 'number' },
+    { label: 'Name',             name: 'name',         type: 'text'   },
+    {
+      label: 'Status',
+      name: 'status',
+      type: 'select',
+      options: ['Scheduled','Paid','Due']
+    },
+    {
+      label: 'Category',
+      name: 'category',
+      type: 'select',
+      options: fd => Array.from(
+        new Set(
+          catRows
+            .filter(c => c.direction === fd.direction)
+            .map(c => c.category)
+        )
+      ).map(c => ({ label: c, value: c }))
+    },
+    {
+      label: 'Subcat1',
+      name: 'subcategory1',
+      type: 'select',
+      options: fd => {
+        if (!fd.category) return [];
+        return Array.from(
+          new Set(
+            catRows
+              .filter(c =>
+                c.direction === fd.direction &&
+                c.category === fd.category
+              )
+              .map(c => c.subcategory1)
+          )
+        ).filter(v => v).map(v => ({ label: v, value: v }));
+      }
+    },
+    {
+      label: 'Subcat2',
+      name: 'subcategory2',
+      type: 'select',
+      options: fd => {
+        if (!fd.subcategory1) return [];
+        return Array.from(
+          new Set(
+            catRows
+              .filter(c =>
+                c.direction === fd.direction &&
+                c.category === fd.category &&
+                c.subcategory1 === fd.subcategory1
+              )
+              .map(c => c.subcategory2)
+          )
+        ).filter(v => v).map(v => ({ label: v, value: v }));
+      }
+    },
+    {
+      label: 'Subcat3',
+      name: 'subcategory3',
+      type: 'select',
+      options: fd => {
+        if (!fd.subcategory2) return [];
+        return Array.from(
+          new Set(
+            catRows
+              .filter(c =>
+                c.direction === fd.direction &&
+                c.category === fd.category &&
+                c.subcategory1 === fd.subcategory1 &&
+                c.subcategory2 === fd.subcategory2
+              )
+              .map(c => c.subcategory3)
+          )
+        ).filter(v => v).map(v => ({ label: v, value: v }));
+      }
+    },
+    {
+      label: 'Provider',
+      name: 'provider',
+      type: 'select',
+      options: fd => {
+        const id = fd.billid;
+        const src = fd.direction === 'Expense' ? bills : fd.direction === 'Income' ? incomes : [];
+        const rec = src.find(x => x.id === id);
+        return rec ? [{ label: rec.provider, value: rec.provider }] : [];
+      }
+    },
+    { label: 'Amount',          name: 'amount',          type: 'number' },
+    { label: 'Transaction Date',name: 'transactiondate', type: 'date'   },
     {
       label: 'Account',
       name: 'accountid',
@@ -76,8 +186,12 @@ export default function TransactionsScreen() {
       type: 'select',
       options: propertyOptions
     }
-  ], [accountOptions, propertyOptions]);
+  ], [
+    bills, incomes, catRows,
+    accountOptions, propertyOptions
+  ]);
 
+  // ─── table columns ────────────────────────────────────────────────────────────
   const columns = useMemo(() => [
     {
       Header: 'Date',
@@ -93,7 +207,9 @@ export default function TransactionsScreen() {
       accessor: 'amount',
       canSort: true,
       Cell: ({ value, row }) => (
-        <span style={{ color: row.original.direction === 'Expense' ? 'red' : 'green' }}>
+        <span style={{
+          color: row.original.direction === 'Expense' ? 'red' : 'green'
+        }}>
           ${Number(value).toFixed(2)}
         </span>
       )
@@ -101,7 +217,7 @@ export default function TransactionsScreen() {
     { Header: 'Category',  accessor: 'category',  canSort: true },
     { Header: 'Subcat1',   accessor: 'subcategory1' },
     { Header: 'Subcat2',   accessor: 'subcategory2' },
-    // { Header: 'Subcat3',   accessor: 'subcategory3' }, // hidden by choice
+    // { Header: 'Subcat3', accessor: 'subcategory3' },
     { Header: 'Provider',  accessor: 'provider',  canSort: true },
     {
       Header: 'Property',
@@ -110,37 +226,28 @@ export default function TransactionsScreen() {
     }
   ], []);
 
-  // transformFetch both decorates each row *and* calculates
-  // totals over the full dataset
-  const transformFetch = useMemo(() => data => {
-    const arr = data
-      .map(item => {
-        const acc  = accountOptions.find(o => o.value === (item.accountid ?? 0)) || {};
-        const prop = propertyOptions.find(o => o.value === (item.propertyid ?? 0)) || {};
-        return {
-          ...item,
-          accountLabel:  acc.label  || 'None',
-          propertyLabel: prop.label || 'None'
-        };
-      })
-      .sort((a, b) =>
-        new Date(a.transactiondate) - new Date(b.transactiondate)
-      );
+  // ─── map IDs → labels ─────────────────────────────────────────────────────────
+  const transformFetch = useMemo(() => data =>
+    data.map(item => {
+      const acc  = accountOptions.find(o => o.value === (item.accountid ?? 0)) || {};
+      const prop = propertyOptions.find(o => o.value === (item.propertyid ?? 0)) || {};
+      return {
+        ...item,
+        accountLabel:  acc.label  || 'None',
+        propertyLabel: prop.label || 'None'
+      };
+    })
+  , [accountOptions, propertyOptions]);
 
-    // compute totals over *all* fetched records
+  // ─── compute totals on every filter ──────────────────────────────────────────
+  const handleFilteredData = filteredArray => {
     let income = 0, expense = 0;
-    arr.forEach(txn => {
+    filteredArray.forEach(txn => {
       if (txn.direction === 'Income')  income  += Number(txn.amount);
-      if (txn.direction === 'Expense') expense += Number(txn.amount);
+      else                              expense += Number(txn.amount);
     });
-    setTotals({
-      income:  income,
-      expense: expense,
-      net:      income - expense
-    });
-
-    return arr;
-  }, [accountOptions, propertyOptions]);
+    setTotals({ income, expense, net: income - expense });
+  };
 
   return (
     <div style={{ padding: '20px' }}>
@@ -162,8 +269,7 @@ export default function TransactionsScreen() {
         columns={columns}
         idField="id"
         transformFetch={transformFetch}
-        initialSortField="transactiondate"
-        initialSortOrder="asc"
+        onFilteredData={handleFilteredData}
       />
     </div>
   );

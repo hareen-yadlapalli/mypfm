@@ -69,10 +69,6 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-
-when editing an income / bill, the corresponding transactions from that start date to be updated, if the existing transaction dates don't match with the new transaction dates, then delete existing ones and add new
-
-transactions is not ascending
-Distance between edit and delete button
-
-optimisation of code, like getting all data at the beginning and cache, get when updated
+Take backkup of the table
+Delete categories not getting deleted
+Add members to accounts, 
