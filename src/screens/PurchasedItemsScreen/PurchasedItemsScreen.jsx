@@ -5,6 +5,8 @@ import CRUDScreen from '../../components/CRUDScreen/CRUDScreen';
 
 const fieldsItems = [
   { label: 'Purchase ID',  name: 'purchaseid', type: 'number' },
+  { label: 'Item Name', name: 'itemname',    type: 'text'   },
+  { label: 'Item Make', name: 'itemmake',    type: 'text'   },
   { label: 'Volume Units', name: 'volunits',    type: 'text'   },
   { label: 'Quantity',     name: 'qty',          type: 'number' },
   { label: 'Price',        name: 'price',        type: 'number' },
