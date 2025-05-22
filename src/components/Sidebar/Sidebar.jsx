@@ -14,6 +14,7 @@ const Sidebar = () => (
     <NavLink to="/purchases"      className="nav-item">Purchases</NavLink>
     <NavLink to="/purchaseditems" className="nav-item">Purchased Items</NavLink>
     <NavLink to="/categories"     className="nav-item">Categories</NavLink>
+    <NavLink to="/pocscreen"     className="nav-item">POC</NavLink>
   </nav>
 );
 

@@ -15,6 +15,7 @@ import PurchasedItemsScreen from './screens/PurchasedItemsScreen/PurchasedItemsS
 import BillsScreen from './screens/BillsScreen/BillsScreen';
 import CategoriesScreen from './screens/CategoriesScreen/CategoriesScreen';
 import IncomesScreen from './screens/IncomesScreen/IncomesScreen';
+import POCScreen from './screens/POCScreen/POCScreen';
 
 import './styles/global.css'; // Global grid & component styles
 
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="/purchaseditems" element={<PurchasedItemsScreen />} />
             <Route path="/bills" element={<BillsScreen />} />
             <Route path="/categories" element={<CategoriesScreen />} />
+            <Route path="/pocscreen" element={<POCScreen />} />
           </Routes>
         </div>
       </div>
